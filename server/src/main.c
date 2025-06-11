@@ -31,7 +31,7 @@ static char **allocate_teams(int count)
     return teams;
 }
 
-static int count_team_args(int *idx, int argc, char **argv)
+static int counteam_t_args(int *idx, int argc, char **argv)
 {
     int count = 0;
 
@@ -45,7 +45,7 @@ static int count_team_args(int *idx, int argc, char **argv)
 static int parse_teams(char ***teams, int *idx, int argc, char **argv)
 {
     int start = *idx;
-    int count = count_team_args(idx, argc, argv);
+    int count = counteam_t_args(idx, argc, argv);
 
     if (count == 0)
         return -1;
@@ -121,7 +121,7 @@ static int parse_option(int opt, char *optarg, void *data[6])
 static int run_server(int port, int width, int height, char **teams,
     int clients_nb, int freq)
 {
-    t_server *server = server_create(port, width, height, teams,
+    server_t *server = server_create(port, width, height, teams,
         clients_nb, freq);
     int ret = 0;
 

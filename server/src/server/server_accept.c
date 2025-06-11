@@ -8,9 +8,9 @@
 #include "server.h"
 #include <fcntl.h>
 
-static t_client *create_new_client(int client_fd)
+static client_t *create_new_client(int client_fd)
 {
-    t_client *client = calloc(1, sizeof(t_client));
+    client_t *client = calloc(1, sizeof(client_t));
     int flags = 0;
 
     if (!client) {
@@ -24,7 +24,7 @@ static t_client *create_new_client(int client_fd)
     return client;
 }
 
-static bool add_client_to_poll(t_server *server, int client_fd)
+static bool add_client_to_poll(server_t *server, int client_fd)
 {
     if (server->poll_count >= MAX_CLIENTS)
         return false;
@@ -34,18 +34,18 @@ static bool add_client_to_poll(t_server *server, int client_fd)
     return true;
 }
 
-static void add_client_to_list(t_server *server, t_client *client)
+static void add_client_to_list(server_t *server, client_t *client)
 {
     client->next = server->clients;
     server->clients = client;
 }
 
-void server_accept_client(t_server *server)
+void server_accepclient_t(server_t *server)
 {
     struct sockaddr_in client_addr = {0};
     socklen_t client_len = sizeof(client_addr);
     int client_fd = 0;
-    t_client *client = NULL;
+    client_t *client = NULL;
 
     client_fd = accept(server->socket_fd, (struct sockaddr *)&client_addr,
         &client_len);
@@ -67,7 +67,7 @@ void server_accept_client(t_server *server)
         inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 }
 
-static void remove_from_poll(t_server *server, int fd)
+static void remove_from_poll(server_t *server, int fd)
 {
     for (int i = 1; i < server->poll_count; i++) {
         if (server->poll_fds[i].fd == fd) {
@@ -79,9 +79,9 @@ static void remove_from_poll(t_server *server, int fd)
     }
 }
 
-static void cleanup_command_queue(t_client *client)
+static void cleanup_command_queue(client_t *client)
 {
-    t_command *next = NULL;
+    command_t *next = NULL;
 
     while (client->cmd_queue) {
         next = client->cmd_queue->next;
@@ -91,9 +91,9 @@ static void cleanup_command_queue(t_client *client)
     }
 }
 
-static void remove_client_from_list(t_server *server, t_client *client)
+static void remove_client_from_list(server_t *server, client_t *client)
 {
-    t_client **current = &server->clients;
+    client_t **current = &server->clients;
 
     while (*current) {
         if (*current == client) {
@@ -104,7 +104,7 @@ static void remove_client_from_list(t_server *server, t_client *client)
     }
 }
 
-void server_disconnect_client(t_server *server, t_client *client)
+void server_disconnecclient(server_t *server, client_t *client)
 {
     if (!client)
         return;

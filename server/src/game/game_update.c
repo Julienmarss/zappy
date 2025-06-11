@@ -2,21 +2,24 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Game update logic
+** Game update logic - FIXED HUNGER SYSTEM
 */
 
 #include "server.h"
 
-static void update_player_actions(t_server *server)
+static void update_player_actions(server_t *server)
 {
-    t_client *client = server->clients;
-    t_player *player = NULL;
+    client_t *client = server->clients;
+    player_t *player = NULL;
 
     while (client) {
         if (client->type == CLIENT_PLAYER && client->player) {
             player = client->player;
             if (player->action_time > 0) {
                 player->action_time--;
+                if (player->action_time == 0) {
+                    printf("DEBUG: Player action completed\n");
+                }
             } else if (client->cmd_queue &&
                 client->cmd_queue->time_limit == 0) {
                 network_process_commands(server, client);
@@ -26,20 +29,32 @@ static void update_player_actions(t_server *server)
     }
 }
 
-static void update_player_food(t_server *server)
+static void update_player_food(server_t *server)
 {
-    t_client *client = server->clients;
-    t_player *player = NULL;
+    client_t *client = server->clients;
+    player_t *player = NULL;
+    static int food_tick = 0;
 
+    food_tick++;
+    if (food_tick < 126) {
+        return;
+    }
+    food_tick = 0;
+    
     while (client) {
         if (client->type == CLIENT_PLAYER && client->player) {
             player = client->player;
             player->food_timer--;
+            printf("DEBUG: Player ID %d food timer: %d\n", player->id, player->food_timer);
+            
             if (player->food_timer <= 0) {
                 if (player->inventory[FOOD] > 0) {
                     player->inventory[FOOD]--;
                     player->food_timer = 126;
+                    printf("DEBUG: Player ID %d consumed food, remaining: %d\n", 
+                           player->id, player->inventory[FOOD]);
                 } else {
+                    printf("DEBUG: Player ID %d starved to death\n", player->id);
                     player_die(server, player);
                 }
             }
@@ -48,12 +63,13 @@ static void update_player_food(t_server *server)
     }
 }
 
-void game_update(t_server *server)
+void game_update(server_t *server)
 {
     static int tick = 0;
 
     update_player_actions(server);
     update_player_food(server);
+    
     tick++;
     if (tick >= 20) {
         game_spawn_resources(server->game);

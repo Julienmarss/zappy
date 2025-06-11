@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-void gui_send_map_size(t_server *server, t_client *client)
+void gui_send_map_size(server_t *server, client_t *client)
 {
     char buffer[64];
 
@@ -16,9 +16,9 @@ void gui_send_map_size(t_server *server, t_client *client)
     network_send(client, buffer);
 }
 
-void gui_send_tile_content(t_server *server, t_client *client, int x, int y)
+void gui_send_tile_content(server_t *server, client_t *client, int x, int y)
 {
-    t_tile *tile = game_get_tile(server->game, x, y);
+    tile_t *tile = game_get_tile(server->game, x, y);
     char buffer[256];
 
     if (!tile)
@@ -30,9 +30,9 @@ void gui_send_tile_content(t_server *server, t_client *client, int x, int y)
     network_send(client, buffer);
 }
 
-void gui_send_teams(t_server *server, t_client *client)
+void gui_send_teams(server_t *server, client_t *client)
 {
-    t_team *team = server->game->teams;
+    team_t *team = server->game->teams;
     char buffer[128];
 
     while (team) {
@@ -42,8 +42,8 @@ void gui_send_teams(t_server *server, t_client *client)
     }
 }
 
-void gui_send_player_position(t_server *server, t_client *client,
-    t_player *player)
+void gui_send_player_position(server_t *server, client_t *client,
+    player_t *player)
 {
     char buffer[128];
 
@@ -55,9 +55,9 @@ void gui_send_player_position(t_server *server, t_client *client,
     network_send(client, buffer);
 }
 
-static void broadcast_to_gui_clients(t_server *server, const char *msg)
+static void broadcast_to_gui_clients(server_t *server, const char *msg)
 {
-    t_client *client = server->clients;
+    client_t *client = server->clients;
 
     while (client) {
         if (client->type == CLIENT_GRAPHIC)
@@ -66,7 +66,7 @@ static void broadcast_to_gui_clients(t_server *server, const char *msg)
     }
 }
 
-void gui_broadcast_player_action(t_server *server, t_player *player,
+void gui_broadcasplayer_t_action(server_t *server, player_t *player,
     const char *action)
 {
     char buffer[128];

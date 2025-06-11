@@ -59,9 +59,9 @@ static int setup_server_socket(int port)
     return sock;
 }
 
-static t_server *allocate_server(void)
+static server_t *allocate_server(void)
 {
-    t_server *server = calloc(1, sizeof(t_server));
+    server_t *server = calloc(1, sizeof(server_t));
 
     if (!server)
         return NULL;
@@ -73,7 +73,7 @@ static t_server *allocate_server(void)
     return server;
 }
 
-static bool init_server_socket(t_server *server, int port)
+static bool iniserver_t_socket(server_t *server, int port)
 {
     server->port = port;
     server->socket_fd = setup_server_socket(port);
@@ -85,14 +85,14 @@ static bool init_server_socket(t_server *server, int port)
     return true;
 }
 
-t_server *server_create(int port, int width, int height, char **teams,
+server_t *server_create(int port, int width, int height, char **teams,
     int nb_clients, int freq)
 {
-    t_server *server = allocate_server();
+    server_t *server = allocate_server();
 
     if (!server)
         return NULL;
-    if (!init_server_socket(server, port)) {
+    if (!iniserver_t_socket(server, port)) {
         free(server->poll_fds);
         free(server);
         return NULL;
@@ -108,9 +108,9 @@ t_server *server_create(int port, int width, int height, char **teams,
     return server;
 }
 
-void server_destroy(t_server *server)
+void server_destroy(server_t *server)
 {
-    t_client *next = NULL;
+    client_t *next = NULL;
 
     if (!server)
         return;

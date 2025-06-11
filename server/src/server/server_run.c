@@ -7,9 +7,9 @@
 
 #include "server.h"
 
-static void handle_client_error(t_server *server, int i)
+static void handle_client_error(server_t *server, int i)
 {
-    t_client *client = server->clients;
+    client_t *client = server->clients;
 
     while (client) {
         if (client->fd == server->poll_fds[i].fd) {
@@ -20,21 +20,25 @@ static void handle_client_error(t_server *server, int i)
     }
 }
 
-static void handle_client_input(t_server *server, int i)
+static void handle_client_input(server_t *server, int i)
 {
-    t_client *client = server->clients;
+    client_t *client = server->clients;
 
     while (client) {
         if (client->fd == server->poll_fds[i].fd) {
-            if (network_receive(server, client) <= 0)
+            int ret = network_receive(server, client);
+            if (ret < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
                 server_disconnect_client(server, client);
+            } else if (ret == 0) {
+                server_disconnect_client(server, client);
+            }
             break;
         }
         client = client->next;
     }
 }
 
-static void handle_client_events(t_server *server)
+static void handle_client_events(server_t *server)
 {
     for (int i = 1; i < server->poll_count; i++) {
         if (server->poll_fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
@@ -42,12 +46,11 @@ static void handle_client_events(t_server *server)
             i--;
         } else if (server->poll_fds[i].revents & POLLIN) {
             handle_client_input(server, i);
-            i--;
         }
     }
 }
 
-static int calculate_timeout(t_server *server)
+static int calculate_timeout(server_t *server)
 {
     long current = get_time_microseconds();
     long elapsed = current - server->current_time;
@@ -57,7 +60,7 @@ static int calculate_timeout(t_server *server)
     return (timeout < 0) ? 0 : timeout;
 }
 
-int server_run(t_server *server)
+int server_run(server_t *server)
 {
     int ret = 0;
     int timeout = 0;

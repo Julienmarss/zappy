@@ -7,7 +7,7 @@
 
 #include "server.h"
 
-int network_send(t_client *client, const char *msg)
+int network_send(client_t *client, const char *msg)
 {
     int len = strlen(msg);
     int remaining = BUFFER_SIZE - client->write_pos;
@@ -28,7 +28,7 @@ int network_send(t_client *client, const char *msg)
     return written;
 }
 
-static int extract_line(t_client *client, char *line, int max_len)
+static int extract_line(client_t *client, char *line, int max_len)
 {
     int i = 0;
 
@@ -45,9 +45,9 @@ static int extract_line(t_client *client, char *line, int max_len)
     return 0;
 }
 
-static t_command *create_command(const char *line)
+static command_t *create_command(const char *line)
 {
-    t_command *cmd = calloc(1, sizeof(t_command));
+    command_t *cmd = calloc(1, sizeof(command_t));
 
     if (!cmd)
         return NULL;
@@ -61,9 +61,9 @@ static t_command *create_command(const char *line)
     return cmd;
 }
 
-static void add_command_to_queue(t_client *client, t_command *cmd)
+static void add_command_to_queue(client_t *client, command_t *cmd)
 {
-    t_command *last = client->cmd_queue;
+    command_t *last = client->cmd_queue;
 
     if (!client->cmd_queue) {
         client->cmd_queue = cmd;
@@ -75,10 +75,10 @@ static void add_command_to_queue(t_client *client, t_command *cmd)
     client->cmd_count++;
 }
 
-static void handle_client_line(t_server *server, t_client *client,
+static void handle_client_line(server_t *server, client_t *client,
     const char *line)
 {
-    t_command *cmd = NULL;
+    command_t *cmd = NULL;
 
     if (client->type == CLIENT_UNKNOWN) {
         network_handle_new_client(server, client, line);
@@ -91,15 +91,20 @@ static void handle_client_line(t_server *server, t_client *client,
     }
 }
 
-int network_receive(t_server *server, t_client *client)
+int network_receive(server_t *server, client_t *client)
 {
     int bytes = 0;
     char line[BUFFER_SIZE];
 
     bytes = read(client->fd, client->read_buffer + client->read_pos,
         BUFFER_SIZE - client->read_pos - 1);
-    if (bytes <= 0)
-        return bytes;
+    if (bytes < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            return 1;  // Not an error, just no data available
+        return -1;
+    }
+    if (bytes == 0)
+        return 0;  // Client closed connection
     client->read_pos += bytes;
     client->read_buffer[client->read_pos] = '\0';
     while (extract_line(client, line, BUFFER_SIZE))

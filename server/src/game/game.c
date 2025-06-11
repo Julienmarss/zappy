@@ -17,14 +17,14 @@ static const float RESOURCE_DENSITY[] = {
     0.05
 };
 
-t_tile **create_map(int width, int height)
+tile_t **create_map(int width, int height)
 {
-    t_tile **map = calloc(height, sizeof(t_tile *));
+    tile_t **map = calloc(height, sizeof(tile_t *));
 
     if (!map)
         return NULL;
     for (int y = 0; y < height; y++) {
-        map[y] = calloc(width, sizeof(t_tile));
+        map[y] = calloc(width, sizeof(tile_t));
         if (!map[y]) {
             for (int i = 0; i < y; i++)
                 free(map[i]);
@@ -32,15 +32,15 @@ t_tile **create_map(int width, int height)
             return NULL;
         }
         for (int x = 0; x < width; x++)
-            map[y][x].players = calloc(MAX_CLIENTS, sizeof(t_player *));
+            map[y][x].players = calloc(MAX_CLIENTS, sizeof(player_t *));
     }
     return map;
 }
 
-t_game *game_create(int width, int height, char **teams, int nb_clients,
+game_t *game_create(int width, int height, char **teams, int nb_clients,
     int freq)
 {
-    t_game *game = calloc(1, sizeof(t_game));
+    game_t *game = calloc(1, sizeof(game_t));
 
     if (!game)
         return NULL;
@@ -57,28 +57,28 @@ t_game *game_create(int width, int height, char **teams, int nb_clients,
     return game;
 }
 
-static void free_teams(t_game *game)
+static void free_teams(game_t *game)
 {
-    t_team *team = game->teams;
-    t_team *next_team = NULL;
-    t_egg *egg = NULL;
-    t_egg *next_egg = NULL;
+    team_t *team = game->teams;
+    team_t *nexteam_t = NULL;
+    egg_t *egg = NULL;
+    egg_t *nexegg_t = NULL;
 
     while (team) {
-        next_team = team->next;
+        nexteam_t = team->next;
         egg = team->eggs;
         while (egg) {
-            next_egg = egg->next;
+            nexegg_t = egg->next;
             free(egg);
-            egg = next_egg;
+            egg = nexegg_t;
         }
         free(team->name);
         free(team);
-        team = next_team;
+        team = nexteam_t;
     }
 }
 
-void free_map(t_game *game)
+void free_map(game_t *game)
 {
     if (!game->map)
         return;
@@ -92,7 +92,7 @@ void free_map(t_game *game)
     free(game->map);
 }
 
-void game_destroy(t_game *game)
+void game_destroy(game_t *game)
 {
     if (!game)
         return;
@@ -101,7 +101,7 @@ void game_destroy(t_game *game)
     free(game);
 }
 
-t_tile *game_get_tile(t_game *game, int x, int y)
+tile_t *game_getile_t(game_t *game, int x, int y)
 {
     if (!game || !game->map)
         return NULL;
@@ -110,11 +110,11 @@ t_tile *game_get_tile(t_game *game, int x, int y)
     return &game->map[y][x];
 }
 
-void game_spawn_resources(t_game *game)
+void game_spawn_resources(game_t *game)
 {
     int total_tiles = 0;
     int quantity = 0;
-    t_tile *tile = NULL;
+    tile_t *tile = NULL;
 
     if (!game)
         return;
@@ -124,7 +124,7 @@ void game_spawn_resources(t_game *game)
         if (quantity < 1)
             quantity = 1;
         for (int j = 0; j < quantity; j++) {
-            tile = game_get_tile(game, rand() % game->width,
+            tile = game_getile_t(game, rand() % game->width,
                 rand() % game->height);
             if (tile)
                 tile->resources[i]++;
