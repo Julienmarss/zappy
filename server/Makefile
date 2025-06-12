@@ -21,6 +21,8 @@ SRCS	=	src/main.c				\
 		src/game/game.c				\
 		src/game/game_teams.c			\
 		src/game/game_update.c			\
+		src/game/game_create.c		\
+		src/game/game_resources.c		\
 		src/game/player.c			\
 		src/network/network.c			\
 		src/network/network_client.c		\

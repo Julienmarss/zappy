@@ -166,19 +166,21 @@ void network_handle_new_client(server_t *server, client_t *client,
     const char *team_name);
 
 // game.c
-game_t *game_create(int width, int height, char **teams, int nb_clients,
-    int freq);
 void game_destroy(game_t *game);
 void game_update(server_t *server);
-void game_spawn_resources(game_t *game);
 tile_t *game_get_tile(game_t *game, int x, int y);
+void free_map(game_t *game);
+
+// game_creation.c
+game_t *game_create(int width, int height, char **teams, int nb_clients,
+    int freq);
+tile_t **create_map(int width, int height);
 
 // game_teams.c
 void init_teams(game_t *game, char **teams, int nb_clients);
 
-// game_map.c
-tile_t **create_map(int width, int height);
-void free_map(game_t *game);
+// game_resources.c
+void game_spawn_resources(game_t *game);
 
 // player.c
 player_t *player_create(team_t *team, int x, int y);

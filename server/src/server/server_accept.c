@@ -40,7 +40,7 @@ static void add_client_to_list(server_t *server, client_t *client)
     server->clients = client;
 }
 
-void server_accepclient_t(server_t *server)
+void server_accept_client(server_t *server)
 {
     struct sockaddr_in client_addr = {0};
     socklen_t client_len = sizeof(client_addr);
@@ -104,7 +104,7 @@ static void remove_client_from_list(server_t *server, client_t *client)
     }
 }
 
-void server_disconnecclient(server_t *server, client_t *client)
+void server_disconnect_client(server_t *server, client_t *client)
 {
     if (!client)
         return;

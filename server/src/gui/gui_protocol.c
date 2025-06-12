@@ -66,7 +66,7 @@ static void broadcast_to_gui_clients(server_t *server, const char *msg)
     }
 }
 
-void gui_broadcasplayer_t_action(server_t *server, player_t *player,
+void gui_broadcast_player_action(server_t *server, player_t *player,
     const char *action)
 {
     char buffer[128];

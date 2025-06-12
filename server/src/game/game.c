@@ -7,15 +7,22 @@
 
 #include "server.h"
 
-static const float RESOURCE_DENSITY[] = {
-    0.5,
-    0.3,
-    0.15,
-    0.1,
-    0.1,
-    0.08,
-    0.05
-};
+static void cleanup_partial_map(tile_t **map, int allocated_rows)
+{
+    for (int i = 0; i < allocated_rows; i++)
+        free(map[i]);
+    free(map);
+}
+
+static bool allocate_map_row(tile_t **map, int y, int width)
+{
+    map[y] = calloc(width, sizeof(tile_t));
+    if (!map[y])
+        return false;
+    for (int x = 0; x < width; x++)
+        map[y][x].players = calloc(MAX_CLIENTS, sizeof(player_t *));
+    return true;
+}
 
 tile_t **create_map(int width, int height)
 {
@@ -24,17 +31,22 @@ tile_t **create_map(int width, int height)
     if (!map)
         return NULL;
     for (int y = 0; y < height; y++) {
-        map[y] = calloc(width, sizeof(tile_t));
-        if (!map[y]) {
-            for (int i = 0; i < y; i++)
-                free(map[i]);
-            free(map);
+        if (!allocate_map_row(map, y, width)) {
+            cleanup_partial_map(map, y);
             return NULL;
         }
-        for (int x = 0; x < width; x++)
-            map[y][x].players = calloc(MAX_CLIENTS, sizeof(player_t *));
     }
     return map;
+}
+
+static bool initialize_game_data(game_t *game, int width, int height,
+    int freq)
+{
+    game->width = width;
+    game->height = height;
+    game->time_unit = freq;
+    game->map = create_map(width, height);
+    return (game->map != NULL);
 }
 
 game_t *game_create(int width, int height, char **teams, int nb_clients,
@@ -44,11 +56,7 @@ game_t *game_create(int width, int height, char **teams, int nb_clients,
 
     if (!game)
         return NULL;
-    game->width = width;
-    game->height = height;
-    game->time_unit = freq;
-    game->map = create_map(width, height);
-    if (!game->map) {
+    if (!initialize_game_data(game, width, height, freq)) {
         free(game);
         return NULL;
     }
@@ -57,25 +65,37 @@ game_t *game_create(int width, int height, char **teams, int nb_clients,
     return game;
 }
 
+static void free_team_eggs(team_t *team)
+{
+    egg_t *egg = team->eggs;
+    egg_t *next_egg = NULL;
+
+    while (egg) {
+        next_egg = egg->next;
+        free(egg);
+        egg = next_egg;
+    }
+}
+
 static void free_teams(game_t *game)
 {
     team_t *team = game->teams;
-    team_t *nexteam_t = NULL;
-    egg_t *egg = NULL;
-    egg_t *nexegg_t = NULL;
+    team_t *next_team = NULL;
 
     while (team) {
-        nexteam_t = team->next;
-        egg = team->eggs;
-        while (egg) {
-            nexegg_t = egg->next;
-            free(egg);
-            egg = nexegg_t;
-        }
+        next_team = team->next;
+        free_team_eggs(team);
         free(team->name);
         free(team);
-        team = nexteam_t;
+        team = next_team;
     }
+}
+
+static void free_map_row(tile_t *row, int width)
+{
+    for (int x = 0; x < width; x++)
+        free(row[x].players);
+    free(row);
 }
 
 void free_map(game_t *game)
@@ -83,11 +103,8 @@ void free_map(game_t *game)
     if (!game->map)
         return;
     for (int y = 0; y < game->height; y++) {
-        if (game->map[y]) {
-            for (int x = 0; x < game->width; x++)
-                free(game->map[y][x].players);
-            free(game->map[y]);
-        }
+        if (game->map[y])
+            free_map_row(game->map[y], game->width);
     }
     free(game->map);
 }
@@ -101,34 +118,11 @@ void game_destroy(game_t *game)
     free(game);
 }
 
-tile_t *game_getile_t(game_t *game, int x, int y)
+tile_t *game_get_tile(game_t *game, int x, int y)
 {
     if (!game || !game->map)
         return NULL;
     x = (x % game->width + game->width) % game->width;
     y = (y % game->height + game->height) % game->height;
     return &game->map[y][x];
-}
-
-void game_spawn_resources(game_t *game)
-{
-    int total_tiles = 0;
-    int quantity = 0;
-    tile_t *tile = NULL;
-
-    if (!game)
-        return;
-    total_tiles = game->width * game->height;
-    for (int i = 0; i < NB_RESOURCES; i++) {
-        quantity = (int)(total_tiles * RESOURCE_DENSITY[i]);
-        if (quantity < 1)
-            quantity = 1;
-        for (int j = 0; j < quantity; j++) {
-            tile = game_getile_t(game, rand() % game->width,
-                rand() % game->height);
-            if (tile)
-                tile->resources[i]++;
-        }
-    }
-    game->last_resource_spawn = get_time_microseconds();
 }

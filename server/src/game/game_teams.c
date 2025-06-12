@@ -76,7 +76,7 @@ static void create_team_eggs(game_t *game, team_t *team, int nb_clients)
     printf("DEBUG: Team %s now has eggs: %p\n", team->name, (void*)team->eggs);
 }
 
-void initeam_ts(game_t *game, char **team_names, int nb_clients)
+void init_teams(game_t *game, char **team_names, int nb_clients)
 {
     team_t *team = NULL;
     team_t *last = NULL;
