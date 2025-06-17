@@ -73,7 +73,7 @@ static server_t *allocate_server(void)
     return server;
 }
 
-static bool iniserver_t_socket(server_t *server, int port)
+static bool init_server_socket(server_t *server, int port)
 {
     server->port = port;
     server->socket_fd = setup_server_socket(port);
@@ -89,16 +89,16 @@ server_t *server_create(int port, int width, int height, char **teams,
     int nb_clients, int freq)
 {
     server_t *server = allocate_server();
-    game_params_t params = {width, height, teams, nb_clients, 0};
+    game_params_t params = {width, height, teams, nb_clients, freq};
 
     if (!server)
         return NULL;
-    if (!iniserver_t_socket(server, port)) {
+    if (!init_server_socket(server, port)) {
         free(server->poll_fds);
         free(server);
         return NULL;
     }
-    server->game = game_create(&params, freq);
+    server->game = game_create(&params);
     if (!server->game) {
         close(server->socket_fd);
         free(server->poll_fds);

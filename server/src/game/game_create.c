@@ -48,13 +48,12 @@ tile_t **create_map(int width, int height)
     return map;
 }
 
-game_t *game_create(game_params_t *params, int freq)
+game_t *game_create(game_params_t *params)
 {
     game_t *game = calloc(1, sizeof(game_t));
 
     if (!game)
         return NULL;
-    params->freq = freq;
     if (!initialize_game_data(game, params)) {
         free(game);
         return NULL;
