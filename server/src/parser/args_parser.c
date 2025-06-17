@@ -6,7 +6,6 @@
 */
 
 #include "parser.h"
-#include <getopt.h>
 
 void print_usage(const char *prog_name)
 {
@@ -79,6 +78,7 @@ int parse_arguments(int argc, char **argv, args_t *args)
         ret = process_single_option(args, &ctx);
         if (ret != 0)
             return ret;
+        opt = getopt(argc, argv, "p:x:y:n:c:f:h");
     }
     return 0;
 }

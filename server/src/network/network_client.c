@@ -40,25 +40,6 @@ static team_t *find_team(game_t *game, const char *name)
     return NULL;
 }
 
-static egg_t *get_available_egg(team_t *team)
-{
-    if (!team->eggs)
-        return NULL;
-    return team->eggs;
-}
-
-static void send_connection_info(client_t *client, team_t *team,
-    int width, int height)
-{
-    char buffer[256];
-
-    snprintf(buffer, sizeof(buffer), "%d\n",
-        team->max_clients - team->connected_clients);
-    network_send(client, buffer);
-    snprintf(buffer, sizeof(buffer), "%d %d\n", width, height);
-    network_send(client, buffer);
-}
-
 static void handle_team_connection(server_t *server, client_t *client,
     const char *clean_name)
 {

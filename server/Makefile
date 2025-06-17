@@ -18,6 +18,7 @@ SRCS	=	src/main.c				\
 		src/server/server.c			\
 		src/server/server_run.c			\
 		src/server/server_accept.c		\
+		src/server/server_events.c		\
 		src/game/game.c				\
 		src/game/game_teams.c			\
 		src/game/game_update.c			\

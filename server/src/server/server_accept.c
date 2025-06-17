@@ -40,21 +40,11 @@ static void add_client_to_list(server_t *server, client_t *client)
     server->clients = client;
 }
 
-void server_accept_client(server_t *server)
+static void handle_client_accept(server_t *server, int client_fd,
+    struct sockaddr_in *client_addr)
 {
-    struct sockaddr_in client_addr = {0};
-    socklen_t client_len = sizeof(client_addr);
-    int client_fd = 0;
-    client_t *client = NULL;
+    client_t *client = create_new_client(client_fd);
 
-    client_fd = accept(server->socket_fd, (struct sockaddr *)&client_addr,
-        &client_len);
-    if (client_fd < 0) {
-        if (errno != EAGAIN && errno != EWOULDBLOCK)
-            perror("accept");
-        return;
-    }
-    client = create_new_client(client_fd);
     if (!client)
         return;
     add_client_to_list(server, client);
@@ -64,7 +54,23 @@ void server_accept_client(server_t *server)
     }
     network_send(client, "WELCOME\n");
     printf("New client connected from %s:%d\n",
-        inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+        inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port));
+}
+
+void server_accept_client(server_t *server)
+{
+    struct sockaddr_in client_addr = {0};
+    socklen_t client_len = sizeof(client_addr);
+    int client_fd = 0;
+
+    client_fd = accept(server->socket_fd, (struct sockaddr *)&client_addr,
+        &client_len);
+    if (client_fd < 0) {
+        if (errno != EAGAIN && errno != EWOULDBLOCK)
+            perror("accept");
+        return;
+    }
+    handle_client_accept(server, client_fd, &client_addr);
 }
 
 static void remove_from_poll(server_t *server, int fd)

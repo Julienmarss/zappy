@@ -46,12 +46,12 @@ static void execute_player_command(server_t *server, client_t *client,
         printf("DEBUG: No command args\n");
         return;
     }
-    
     printf("DEBUG: Executing command '%s'\n", args[0]);
     cmd = find_command(args[0]);
     if (cmd) {
         client->player->action_time = cmd->time;
-        printf("DEBUG: Command '%s' will take %d time units\n", args[0], cmd->time);
+        printf("DEBUG: Command '%s' will take %d time units\n",
+            args[0], cmd->time);
         cmd->func(server, client, args);
     } else {
         printf("DEBUG: Unknown command '%s', sending ko\n", args[0]);
@@ -65,23 +65,20 @@ void network_process_commands(server_t *server, client_t *client)
     char **args = NULL;
 
     if (!client->cmd_queue || client->player->action_time > 0) {
-        printf("DEBUG: No commands to process or player busy (action_time: %d)\n", 
-               client->player ? client->player->action_time : -1);
+        printf("DEBUG: No commands to process or player busy "
+            "(action_time: %d)\n",
+            client->player ? client->player->action_time : -1);
         return;
     }
-    
     cmd = client->cmd_queue;
     client->cmd_queue = cmd->next;
     client->cmd_count--;
-    
     printf("DEBUG: Processing command: '%s'\n", cmd->cmd);
     args = str_split(cmd->cmd, ' ');
     if (args && args[0])
         execute_player_command(server, client, args);
     else
         network_send(client, "ko\n");
-    
     free_array(args);
     free(cmd->cmd);
-    free(cmd);
 }

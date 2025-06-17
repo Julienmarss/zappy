@@ -62,6 +62,33 @@ typedef struct s_egg egg_t;
 typedef struct s_tile tile_t;
 typedef struct s_command command_t;
 typedef struct s_cmd_info cmd_info_t;
+typedef struct s_game_params game_params_t;
+typedef struct s_server_config server_config_t;
+typedef struct s_split_ctx split_ctx_t;
+
+struct s_split_ctx {
+    char **result;
+    int *idx;
+    int *word_idx;
+    char delim;
+};
+
+struct s_server_config {
+    int port;
+    int width;
+    int height;
+    char **teams;
+    int nb_clients;
+    int freq;
+};
+
+struct s_game_params {
+    int width;
+    int height;
+    char **teams;
+    int nb_clients;
+    int freq;
+};
 
 struct s_command {
     char *cmd;
@@ -147,14 +174,16 @@ struct s_server {
 };
 
 // server.c
-server_t *server_create(int port, int width, int height, char **teams,
-    int nb_clients, int freq);
+server_t *server_create(server_config_t *config);
 void server_destroy(server_t *server);
 int server_run(server_t *server);
 
 // server_accept.c
 void server_accept_client(server_t *server);
 void server_disconnect_client(server_t *server, client_t *client);
+
+// server_events.c
+int handle_poll_events(server_t *server, int ret);
 
 // network.c
 int network_send(client_t *client, const char *msg);
@@ -186,8 +215,7 @@ tile_t *game_get_tile(game_t *game, int x, int y);
 void free_map(game_t *game);
 
 // game_creation.c
-game_t *game_create(int width, int height, char **teams, int nb_clients,
-    int freq);
+game_t *game_create(game_params_t *params);
 tile_t **create_map(int width, int height);
 
 // game_teams.c
@@ -238,5 +266,6 @@ char *int_to_str(int n);
 
 // str_utils.c
 char **str_split(const char *str, char delim);
+char *str_trim(char *str);
 
 #endif /* !SERVER_H_ */

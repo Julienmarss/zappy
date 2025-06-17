@@ -18,6 +18,7 @@ static command_t *create_command(const char *line)
         free(cmd);
         return NULL;
     }
+    str_trim(cmd->cmd);
     cmd->time_limit = 0;
     cmd->next = NULL;
     return cmd;

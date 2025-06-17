@@ -85,15 +85,15 @@ static bool init_server_socket(server_t *server, int port)
     return true;
 }
 
-server_t *server_create(int port, int width, int height, char **teams,
-    int nb_clients, int freq)
+server_t *server_create(server_config_t *config)
 {
     server_t *server = allocate_server();
-    game_params_t params = {width, height, teams, nb_clients, freq};
+    game_params_t params = {config->width, config->height, config->teams,
+        config->nb_clients, config->freq};
 
     if (!server)
         return NULL;
-    if (!init_server_socket(server, port)) {
+    if (!init_server_socket(server, config->port)) {
         free(server->poll_fds);
         free(server);
         return NULL;

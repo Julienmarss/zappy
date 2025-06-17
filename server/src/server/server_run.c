@@ -7,49 +7,6 @@
 
 #include "server.h"
 
-static void handle_client_error(server_t *server, int i)
-{
-    client_t *client = server->clients;
-
-    while (client) {
-        if (client->fd == server->poll_fds[i].fd) {
-            server_disconnect_client(server, client);
-            break;
-        }
-        client = client->next;
-    }
-}
-
-static void handle_client_input(server_t *server, int i)
-{
-    client_t *client = server->clients;
-
-    while (client) {
-        if (client->fd == server->poll_fds[i].fd) {
-            int ret = network_receive(server, client);
-            if (ret < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                server_disconnect_client(server, client);
-            } else if (ret == 0) {
-                server_disconnect_client(server, client);
-            }
-            break;
-        }
-        client = client->next;
-    }
-}
-
-static void handle_client_events(server_t *server)
-{
-    for (int i = 1; i < server->poll_count; i++) {
-        if (server->poll_fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-            handle_client_error(server, i);
-            i--;
-        } else if (server->poll_fds[i].revents & POLLIN) {
-            handle_client_input(server, i);
-        }
-    }
-}
-
 static int calculate_timeout(server_t *server)
 {
     long current = get_time_microseconds();
@@ -60,31 +17,45 @@ static int calculate_timeout(server_t *server)
     return (timeout < 0) ? 0 : timeout;
 }
 
+static bool should_update_game(server_t *server)
+{
+    long current = get_time_microseconds();
+    long time_unit_us = 1000000 / server->game->time_unit;
+
+    if (current - server->current_time >= time_unit_us) {
+        server->current_time = current;
+        return true;
+    }
+    return false;
+}
+
+static int handle_poll_error(int ret)
+{
+    if (ret >= 0)
+        return 0;
+    if (errno == EINTR)
+        return 1;
+    perror("poll");
+    return 84;
+}
+
 int server_run(server_t *server)
 {
     int ret = 0;
     int timeout = 0;
-    long current = 0;
-    long time_unit_us = 1000000 / server->game->time_unit;
+    int error_code = 0;
 
     while (1) {
         timeout = calculate_timeout(server);
         ret = poll(server->poll_fds, server->poll_count, timeout);
-        if (ret < 0) {
-            if (errno == EINTR)
-                continue;
-            perror("poll");
+        error_code = handle_poll_error(ret);
+        if (error_code == 84)
             return 84;
-        }
-        if (server->poll_fds[0].revents & POLLIN)
-            server_accept_client(server);
-        if (ret > 0)
-            handle_client_events(server);
-        current = get_time_microseconds();
-        if (current - server->current_time >= time_unit_us) {
-            server->current_time = current;
+        if (error_code == 1)
+            continue;
+        handle_poll_events(server, ret);
+        if (should_update_game(server))
             game_update(server);
-        }
     }
     return 0;
 }
