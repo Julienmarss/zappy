@@ -41,7 +41,7 @@ char *str_concat(const char *s1, const char *s2)
 char *int_to_str(int n)
 {
     char buffer[32];
-    
+
     snprintf(buffer, sizeof(buffer), "%d", n);
     return strdup(buffer);
 }

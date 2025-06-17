@@ -14,7 +14,8 @@ player_t *player_create(team_t *team, int x, int y)
 
     if (!player)
         return NULL;
-    player->id = ++id_counter;
+    id_counter++;
+    player->id = id_counter;
     player->x = x;
     player->y = y;
     player->orientation = (rand() % 4) + 1;
@@ -24,24 +25,24 @@ player_t *player_create(team_t *team, int x, int y)
     player->team = team;
     player->is_incanting = false;
     player->action_time = 0;
-    printf("DEBUG: Created player ID %d at (%d,%d), orientation %d, level %d\n",
-           player->id, x, y, player->orientation, player->level);
+    printf("DEBUG: Created player ID %d (%d,%d), orientation %d, lvl %d\n",
+        player->id, x, y, player->orientation, player->level);
     return player;
 }
 
 void player_add_to_tile(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
-    
+
     if (!tile || tile->player_count >= MAX_CLIENTS) {
-        printf("DEBUG: Failed to add player to tile (%d,%d)\n", player->x, player->y);
+        printf("DEBUG: Failed to add player to tile (%d,%d)\n",
+            player->x, player->y);
         return;
     }
-    
     tile->players[tile->player_count] = player;
     tile->player_count++;
-    printf("DEBUG: Added player ID %d to tile (%d,%d), count: %d\n", 
-           player->id, player->x, player->y, tile->player_count);
+    printf("DEBUG: Added player ID %d to tile (%d,%d), count: %d\n",
+        player->id, player->x, player->y, tile->player_count);
 }
 
 void player_destroy(player_t *player)
@@ -60,9 +61,7 @@ void player_die(server_t *server, player_t *player)
 
     if (!player)
         return;
-    
     printf("DEBUG: Player ID %d is dying\n", player->id);
-    
     for (client = server->clients; client; client = client->next) {
         if (client->player == player) {
             network_send(client, "dead\n");

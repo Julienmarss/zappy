@@ -89,6 +89,7 @@ server_t *server_create(int port, int width, int height, char **teams,
     int nb_clients, int freq)
 {
     server_t *server = allocate_server();
+    game_params_t params = {width, height, teams, nb_clients, 0};
 
     if (!server)
         return NULL;
@@ -97,7 +98,7 @@ server_t *server_create(int port, int width, int height, char **teams,
         free(server);
         return NULL;
     }
-    server->game = game_create(width, height, teams, nb_clients, freq);
+    server->game = game_create(&params, freq);
     if (!server->game) {
         close(server->socket_fd);
         free(server->poll_fds);

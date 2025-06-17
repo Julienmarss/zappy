@@ -13,13 +13,14 @@ static egg_t *create_egg(game_t *game, team_t *team)
 
     if (!egg)
         return NULL;
-    egg->id = game->egg_id_counter++;
+    egg->id = game->egg_id_counter;
+    game->egg_id_counter++;
     egg->x = rand() % game->width;
     egg->y = rand() % game->height;
     egg->team = team;
     egg->next = NULL;
-    printf("DEBUG: Created egg ID %d at (%d,%d) for team %s\n", 
-           egg->id, egg->x, egg->y, team->name);
+    printf("DEBUG: Created egg ID %d at (%d,%d) for team %s\n",
+        egg->id, egg->x, egg->y, team->name);
     return egg;
 }
 
@@ -36,7 +37,8 @@ static void add_egg_to_tile(game_t *game, egg_t *egg)
     while (*current)
         current = &(*current)->next;
     *current = egg;
-    printf("DEBUG: Added egg ID %d to tile (%d,%d)\n", egg->id, egg->x, egg->y);
+    printf("DEBUG: Added egg ID %d to tile (%d,%d)\n",
+        egg->id, egg->x, egg->y);
 }
 
 static team_t *create_team(const char *name, int nb_clients)
@@ -54,7 +56,8 @@ static team_t *create_team(const char *name, int nb_clients)
     team->connected_clients = 0;
     team->eggs = NULL;
     team->next = NULL;
-    printf("DEBUG: Created team '%s' with max %d clients\n", name, nb_clients);
+    printf("DEBUG: Created team '%s' with max %d clients\n",
+        name, nb_clients);
     return team;
 }
 
@@ -66,14 +69,16 @@ static void create_team_eggs(game_t *game, team_t *team, int nb_clients)
     for (int j = 0; j < nb_clients; j++) {
         egg = create_egg(game, team);
         if (!egg) {
-            printf("DEBUG: Failed to create egg %d for team %s\n", j, team->name);
+            printf("DEBUG: Failed to create egg %d for team %s\n",
+                j, team->name);
             continue;
         }
         egg->next = team->eggs;
         team->eggs = egg;
         add_egg_to_tile(game, egg);
     }
-    printf("DEBUG: Team %s now has eggs: %p\n", team->name, (void*)team->eggs);
+    printf("DEBUG: Team %s now has eggs: %p\n",
+        team->name, (void *)team->eggs);
 }
 
 void init_teams(game_t *game, char **team_names, int nb_clients)

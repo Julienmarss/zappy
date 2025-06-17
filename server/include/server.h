@@ -161,9 +161,23 @@ int network_send(client_t *client, const char *msg);
 int network_receive(server_t *server, client_t *client);
 void network_process_commands(server_t *server, client_t *client);
 
+// network_handler.c
+void network_handle_client_line(server_t *server, client_t *client,
+    const char *line);
+
 // network_client.c
 void network_handle_new_client(server_t *server, client_t *client,
     const char *team_name);
+
+// network_player.c
+void network_reject_connection(server_t *server, client_t *client);
+void network_handle_player_connection(server_t *server, client_t *client,
+    team_t *team);
+void network_send_connection_info(client_t *client, team_t *team,
+    int width, int height);
+
+// network_gui.c
+void network_handle_graphic_connection(server_t *server, client_t *client);
 
 // game.c
 void game_destroy(game_t *game);

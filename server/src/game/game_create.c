@@ -7,14 +7,6 @@
 
 #include "server.h"
 
-typedef struct {
-    int width;
-    int height;
-    char **teams;
-    int nb_clients;
-    int freq;
-} game_params_t;
-
 static void cleanup_partial_map(tile_t **map, int allocated_rows)
 {
     for (int i = 0; i < allocated_rows; i++)
@@ -32,6 +24,15 @@ static bool allocate_map_row(tile_t **map, int y, int width)
     return true;
 }
 
+static bool initialize_game_data(game_t *game, game_params_t *params)
+{
+    game->width = params->width;
+    game->height = params->height;
+    game->time_unit = params->freq;
+    game->map = create_map(params->width, params->height);
+    return (game->map != NULL);
+}
+
 tile_t **create_map(int width, int height)
 {
     tile_t **map = calloc(height, sizeof(tile_t *));
@@ -47,28 +48,18 @@ tile_t **create_map(int width, int height)
     return map;
 }
 
-static bool initialize_game_data(game_t *game, game_params_t *params)
-{
-    game->width = params->width;
-    game->height = params->height;
-    game->time_unit = params->freq;
-    game->map = create_map(params->width, params->height);
-    return (game->map != NULL);
-}
-
-game_t *game_create(int width, int height, char **teams, int nb_clients,
-    int freq)
+game_t *game_create(game_params_t *params, int freq)
 {
     game_t *game = calloc(1, sizeof(game_t));
-    game_params_t params = {width, height, teams, nb_clients, freq};
 
     if (!game)
         return NULL;
-    if (!initialize_game_data(game, &params)) {
+    params->freq = freq;
+    if (!initialize_game_data(game, params)) {
         free(game);
         return NULL;
     }
-    init_teams(game, teams, nb_clients);
+    init_teams(game, params->teams, params->nb_clients);
     game_spawn_resources(game);
     return game;
 }

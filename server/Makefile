@@ -25,8 +25,13 @@ SRCS	=	src/main.c				\
 		src/game/game_resources.c		\
 		src/game/player.c			\
 		src/network/network.c			\
+		src/network/network_handler.c		\
 		src/network/network_client.c		\
+		src/network/network_player.c		\
+		src/network/network_gui.c		\
 		src/network/network_commands.c		\
+		src/parser/args_parser.c		\
+		src/parser/args_teams.c        \
 		src/commands/commands_move.c		\
 		src/commands/commands_info.c		\
 		src/commands/commands_action.c		\
