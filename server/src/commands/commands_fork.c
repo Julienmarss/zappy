@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Fork command implementation
+** commands_fork
 */
 
 #include "server.h"

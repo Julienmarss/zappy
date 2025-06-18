@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Movement commands implementation - FIXED
+** commands_move
 */
 
 #include "server.h"

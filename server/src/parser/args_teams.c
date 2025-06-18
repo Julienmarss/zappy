@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Arguments parser implementation - Part 2 (Teams & Options)
+** args_teams
 */
 
 #include "parser.h"

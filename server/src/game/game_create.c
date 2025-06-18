@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Game creation logic
+** game_create
 */
 
 #include "server.h"

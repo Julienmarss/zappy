@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Server client acceptance
+** server_accept
 */
 
 #include "server.h"

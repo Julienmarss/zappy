@@ -184,6 +184,11 @@ typedef struct elevation_req_s {
     int thystame;
 } elevation_req_t;
 
+typedef struct s_position {
+    int x;
+    int y;
+} position_t;
+
 // server.c
 server_t *server_create(server_config_t *config);
 void server_destroy(server_t *server);
@@ -287,7 +292,7 @@ const char *get_resource_name_by_index(int index);
 // commands_take.c
 void cmd_take(server_t *server, client_t *client, char **args);
 
-// commands_set.c 
+// commands_set.c
 void cmd_set(server_t *server, client_t *client, char **args);
 
 // commands_fork.c
@@ -298,5 +303,9 @@ void cmd_eject(server_t *server, client_t *client, char **args);
 
 // commands_incantation.c
 void cmd_incantation(server_t *server, client_t *client, char **args);
+
+// commands_look.c
+void build_player_vision(server_t *server, player_t *player, char *buffer);
+void build_tile_content(char *buffer, tile_t *tile, bool is_current_tile);
 
 #endif /* !SERVER_H_ */

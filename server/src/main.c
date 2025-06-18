@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Server main entry point
+** main
 */
 
 #include "server.h"

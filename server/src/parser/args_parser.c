@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Arguments parser implementation - Part 1
+** args_parser
 */
 
 #include "parser.h"

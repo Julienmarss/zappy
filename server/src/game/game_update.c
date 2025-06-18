@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Game update logic - FIXED HUNGER SYSTEM
+** game_update
 */
 
 #include "server.h"

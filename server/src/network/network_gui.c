@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Network GUI connection handling - Part 3
+** network_gui
 */
 
 #include "server.h"

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Server main loop
+** server_run
 */
 
 #include "server.h"

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI protocol implementation
+** gui_protocol
 */
 
 #include "server.h"

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Player implementation - FIXED with tile management
+** player
 */
 
 #include "server.h"

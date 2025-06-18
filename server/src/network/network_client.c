@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Client handling for network - Part 1
+** network_client
 */
 
 #include "server.h"

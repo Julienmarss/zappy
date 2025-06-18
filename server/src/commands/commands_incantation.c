@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Incantation command implementation
+** commands_incantation
 */
 
 #include "server.h"

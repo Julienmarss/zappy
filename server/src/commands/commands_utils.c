@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Commands utility functions
+** commands_utils
 */
 
 #include "server.h"

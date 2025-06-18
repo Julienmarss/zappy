@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Game logic implementation - Core functions only
+** game
 */
 
 #include "server.h"

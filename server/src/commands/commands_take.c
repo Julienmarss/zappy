@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Take command implementation
+** commands_take
 */
 
 #include "server.h"

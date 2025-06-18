@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Server events handling
+** server_events
 */
 
 #include "server.h"

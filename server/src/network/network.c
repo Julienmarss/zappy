@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Network implementation - Part 1
+** network
 */
 
 #include "server.h"

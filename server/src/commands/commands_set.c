@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Set command implementation
+** commands_set
 */
 
 #include "server.h"

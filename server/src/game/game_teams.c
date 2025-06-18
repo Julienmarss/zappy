@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Teams management - FIXED VERSION
+** game_teams
 */
 
 #include "server.h"

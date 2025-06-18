@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Network player connection handling - Part 2
+** network_player
 */
 
 #include "server.h"

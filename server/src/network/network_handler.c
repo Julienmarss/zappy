@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Network command handler - Part 2
+** network_handler
 */
 
 #include "server.h"

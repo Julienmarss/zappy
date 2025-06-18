@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** String utilities - split and trim functions
+** str_utils
 */
 
 #include "server.h"

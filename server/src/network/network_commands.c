@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Network commands processing - STRUCT IN HEADER
+** network_commands
 */
 
 #include "server.h"

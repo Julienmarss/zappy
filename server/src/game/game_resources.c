@@ -2,19 +2,19 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Game resources spawning logic
+** game_resources
 */
 
 #include "server.h"
 
 static const float RESOURCE_DENSITY[] = {
-    0.5,
-    0.3,
-    0.15,
-    0.1,
-    0.1,
-    0.08,
-    0.05
+    0.05,
+    0.03,
+    0.015,
+    0.01,
+    0.01,
+    0.008,
+    0.005
 };
 
 static void spawn_resource_type(game_t *game, int resource_type, int quantity)
