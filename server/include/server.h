@@ -173,6 +173,17 @@ struct s_server {
     long current_time;
 };
 
+typedef struct elevation_req_s {
+    int level;
+    int nb_players;
+    int linemate;
+    int deraumere;
+    int sibur;
+    int mendiane;
+    int phiras;
+    int thystame;
+} elevation_req_t;
+
 // server.c
 server_t *server_create(server_config_t *config);
 void server_destroy(server_t *server);
@@ -267,5 +278,25 @@ char *int_to_str(int n);
 // str_utils.c
 char **str_split(const char *str, char delim);
 char *str_trim(char *str);
+
+// commands_utils.c
+int get_resource_index_by_name(const char *resource_name);
+bool is_valid_resource_name(const char *resource_name);
+const char *get_resource_name_by_index(int index);
+
+// commands_take.c
+void cmd_take(server_t *server, client_t *client, char **args);
+
+// commands_set.c 
+void cmd_set(server_t *server, client_t *client, char **args);
+
+// commands_fork.c
+void cmd_fork(server_t *server, client_t *client, char **args);
+
+// commands_eject.c
+void cmd_eject(server_t *server, client_t *client, char **args);
+
+// commands_incantation.c
+void cmd_incantation(server_t *server, client_t *client, char **args);
 
 #endif /* !SERVER_H_ */

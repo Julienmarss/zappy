@@ -35,7 +35,12 @@ SRCS	=	src/main.c				\
 		src/parser/args_teams.c        \
 		src/commands/commands_move.c		\
 		src/commands/commands_info.c		\
-		src/commands/commands_action.c		\
+		src/commands/commands_take.c		\
+		src/commands/commands_set.c		\
+		src/commands/commands_utils.c		\
+		src/commands/commands_fork.c		\
+		src/commands/commands_eject.c		\
+		src/commands/commands_incantation.c		\
 		src/gui/gui_protocol.c			\
 		src/utils/utils.c			\
 		src/utils/str_utils.c
