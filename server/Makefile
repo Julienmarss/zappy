@@ -47,6 +47,12 @@ SRCS	=	src/main.c				\
 		src/commands/vision_system.c		\
 		src/commands/vision_content.c		\
 		src/gui/gui_protocol.c			\
+		src/gui/gui_map_commands.c		\
+		src/gui/gui_team_commands.c		\
+		src/gui/gui_player_commands.c		\
+		src/gui/gui_time_commands.c		\
+		src/gui/gui_utils.c			\
+		src/gui/broadcasts/gui_broadcast.c	\
 		src/utils/utils.c			\
 		src/utils/str_utils.c
 

@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static const elevation_req_t ELEVATION_REQUIREMENTS[] = {
     {1, 1, 1, 0, 0, 0, 0, 0},

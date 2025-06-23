@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static void calculate_eject_direction(int orientation, int *dx, int *dy)
 {

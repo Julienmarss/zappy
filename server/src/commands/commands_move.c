@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static void shift_players_left(tile_t *tile, int start_index)
 {

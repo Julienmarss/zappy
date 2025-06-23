@@ -6,7 +6,7 @@
 */
 
 #include "server.h"
-#include "gui.h"
+#include "gui_protocol.h"
 
 static command_t *create_command(const char *line)
 {

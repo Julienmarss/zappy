@@ -22,6 +22,7 @@
 
     #define MAX_CLIENTS 1024
     #define BUFFER_SIZE 4096
+    #define MAX_BUFFER_SIZE 16384
     #define MAX_TEAMS 10
     #define MAX_CMD_QUEUE 10
     #define DEFAULT_PORT 4242
@@ -189,6 +190,13 @@ typedef struct s_position {
     int y;
 } position_t;
 
+typedef struct vision_params_s {
+    server_t *server;
+    player_t *player;
+    char *buffer;
+    bool is_first_tile;
+} vision_params_t;
+
 // server.c
 server_t *server_create(server_config_t *config);
 void server_destroy(server_t *server);
@@ -280,21 +288,8 @@ int get_resource_index_by_name(const char *resource_name);
 bool is_valid_resource_name(const char *resource_name);
 const char *get_resource_name_by_index(int index);
 
-// commands_take.c
-void cmd_take(server_t *server, client_t *client, char **args);
-bool validate_take_request(client_t *client, char **args);
-bool check_resource_availability(server_t *server, player_t *player,
-    const char *resource_name);
-void execute_take_action(server_t *server, player_t *player,
-    const char *resource_name);
-
 // commands_set.c
 void cmd_set(server_t *server, client_t *client, char **args);
-bool validate_set_request(client_t *client, char **args);
-bool check_inventory_availability(player_t *player,
-    const char *resource_name);
-void execute_set_action(server_t *server, player_t *player,
-    const char *resource_name);
 
 // commands_fork.c
 void cmd_fork(server_t *server, client_t *client, char **args);
@@ -303,12 +298,15 @@ void cmd_fork(server_t *server, client_t *client, char **args);
 void cmd_eject(server_t *server, client_t *client, char **args);
 int eject_other_players(server_t *server, player_t *ejector);
 
+void eject_single_player(server_t *server, player_t *ejector,
+    player_t *target);
+void remove_player_from_old_tile(server_t *server, player_t *player);
+void add_player_to_new_tile(server_t *server, player_t *player,
+    int new_x, int new_y);
+void destroy_eggs_on_tile(server_t *server, int x, int y);
+
 // commands_incantation.c
 void cmd_incantation(server_t *server, client_t *client, char **args);
-bool validate_incantation_request(client_t *client);
-bool check_incantation_requirements(server_t *server, player_t *player);
-void consume_elevation_resources(server_t *server, player_t *player);
-void elevate_same_level_players(server_t *server, player_t *initiator);
 
 // commands_broadcast.c
 int calculate_sound_direction(server_t *server, player_t *listener,

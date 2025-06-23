@@ -5,7 +5,7 @@
 ** GUI broadcast functions for server events
 */
 
-#include "gui.h"
+#include "gui_protocol.h"
 
 void gui_broadcast_new_player(server_t *server, player_t *player)
 {
@@ -259,4 +259,72 @@ void gui_broadcast_server_message(server_t *server, const char *message)
     snprintf(response, sizeof(response), "smg %s\n", message);
     gui_send_to_all_graphic_clients(server, response);
     printf("DEBUG: Broadcasted server message: %s\n", message);
+}
+
+/*
+** EPITECH PROJECT, 2025
+** Zappy
+** File description:
+** GUI broadcast player action function
+** À ajouter dans server/src/gui/broadcasts/gui_broadcast.c
+*/
+
+static action_type_t get_action_type(const char *action_str)
+{
+    if (strcmp(action_str, "move") == 0)
+        return ACTION_MOVE;
+    if (strcmp(action_str, "turn") == 0)
+        return ACTION_TURN;
+    if (strcmp(action_str, "take") == 0)
+        return ACTION_TAKE;
+    if (strcmp(action_str, "set") == 0)
+        return ACTION_SET;
+    if (strcmp(action_str, "eject") == 0)
+        return ACTION_EJECT;
+    if (strcmp(action_str, "incantation") == 0)
+        return ACTION_INCANTATION;
+    return ACTION_UNKNOWN;
+}
+
+static void execute_gui_action(server_t *server, player_t *player,
+    action_type_t action)
+{
+    switch (action) {
+        case ACTION_MOVE:
+        case ACTION_TURN:
+            gui_broadcast_player_position(server, player);
+            break;
+        case ACTION_TAKE:
+            gui_broadcast_resource_collect(server, player, 0);
+            gui_broadcast_player_inventory(server, player);
+            break;
+        case ACTION_SET:
+            gui_broadcast_resource_drop(server, player, 0);
+            gui_broadcast_player_inventory(server, player);
+            break;
+        case ACTION_EJECT:
+            gui_broadcast_player_expulsion(server, player);
+            break;
+        case ACTION_INCANTATION:
+            printf("DEBUG: Incantation broadcast not fully implemented\n");
+            break;
+        default:
+            printf("DEBUG: Unknown action type\n");
+            break;
+    }
+}
+
+void gui_broadcast_player_action(server_t *server, player_t *player,
+    const char *action_type)
+{
+    action_type_t action = ACTION_UNKNOWN;
+
+    if (!player || !action_type) {
+        printf("DEBUG: Cannot broadcast player action - invalid data\n");
+        return;
+    }
+    action = get_action_type(action_type);
+    execute_gui_action(server, player, action);
+    printf("DEBUG: Broadcasted player action: %s for player %d\n",
+        action_type, player->id);
 }

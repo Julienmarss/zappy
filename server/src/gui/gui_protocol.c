@@ -5,7 +5,7 @@
 ** gui_protocol
 */
 
-#include "gui.h"
+#include "gui_protocol.h"
 
 static const gui_handler_t GUI_HANDLERS[] = {
     {"msz", gui_cmd_msz, false},

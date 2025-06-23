@@ -5,7 +5,7 @@
 ** GUI map commands implementation
 */
 
-#include "gui.h"
+#include "gui_protocol.h"
 
 void gui_cmd_msz(server_t *server, client_t *client, char **args)
 {

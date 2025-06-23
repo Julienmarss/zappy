@@ -6,7 +6,7 @@
 */
 
 #include "server.h"
-#include "gui.h"
+#include "gui_protocol.h"
 
 player_t *player_create(team_t *team, int x, int y)
 {

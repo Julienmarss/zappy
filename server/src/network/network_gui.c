@@ -6,7 +6,7 @@
 */
 
 #include "server.h"
-#include "gui.h"
+#include "gui_protocol.h"
 
 static void send_initial_map_data(server_t *server, client_t *client)
 {
@@ -15,7 +15,7 @@ static void send_initial_map_data(server_t *server, client_t *client)
     gui_cmd_tna(server, client, NULL);
 }
 
-static void send_initial_player_data(server_t *server, client_t *client)
+static void send_initial_player_data(server_t *server)
 {
     client_t *c = server->clients;
 
@@ -44,10 +44,11 @@ void network_handle_graphic_connection(server_t *server, client_t *client)
     send_initial_map_data(server, client);
     
     printf("DEBUG: Sending initial player data\n");
-    send_initial_player_data(server, client);
+    send_initial_player_data(server);
     
     printf("DEBUG: Sending time unit\n");
     send_time_unit(server, client);
     
     printf("DEBUG: Graphic client setup complete\n");
 }
+

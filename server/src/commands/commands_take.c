@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static bool validate_take_request(client_t *client, char **args)
 {

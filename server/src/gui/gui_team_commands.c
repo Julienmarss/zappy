@@ -5,7 +5,7 @@
 ** GUI team commands implementation
 */
 
-#include "gui.h"
+#include "gui_protocol.h"
 
 static void send_single_team_name(client_t *client, const char *team_name)
 {

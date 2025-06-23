@@ -18,6 +18,16 @@ typedef struct s_gui_handler {
     bool need_args;
 } gui_handler_t;
 
+typedef enum action_type_e {
+    ACTION_MOVE,
+    ACTION_TURN,
+    ACTION_TAKE,
+    ACTION_SET,
+    ACTION_EJECT,
+    ACTION_INCANTATION,
+    ACTION_UNKNOWN
+} action_type_t;
+
 // gui_protocol.c
 void gui_init_handlers(void);
 void gui_handle_command(server_t *server, client_t *client, const char *line);
@@ -71,5 +81,15 @@ char *gui_format_player_id(int player_id);
 char *gui_format_egg_id(int egg_id);
 bool gui_is_valid_coordinates(server_t *server, int x, int y);
 bool gui_is_valid_player_id(server_t *server, int player_id);
+
+void eject_single_player(server_t *server, player_t *ejector,
+    player_t *target);
+void remove_player_from_old_tile(server_t *server, player_t *player);
+void add_player_to_new_tile(server_t *server, player_t *player,
+    int new_x, int new_y);
+void destroy_eggs_on_tile(server_t *server, int x, int y);
+
+void gui_broadcast_player_action(server_t *server, player_t *player,
+    const char *action_type);
 
 #endif /* !GUI_H_ */

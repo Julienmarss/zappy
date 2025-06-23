@@ -6,7 +6,7 @@
 */
 
 #include "server.h"
-#include "gui.h"
+#include "gui_protocol.h"
 
 static player_t *setup_player_from_egg(server_t *server, team_t *team,
     egg_t *egg)

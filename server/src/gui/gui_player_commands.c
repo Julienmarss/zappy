@@ -5,7 +5,7 @@
 ** GUI player commands implementation
 */
 
-#include "gui.h"
+#include "gui_protocol.h"
 
 static player_t *find_player_by_id(server_t *server, int player_id)
 {

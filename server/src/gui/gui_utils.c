@@ -5,7 +5,7 @@
 ** GUI utility functions
 */
 
-#include "gui.h"
+#include "gui_protocol.h"
 
 void gui_send_to_all_graphic_clients(server_t *server, const char *message)
 {
