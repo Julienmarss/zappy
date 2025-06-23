@@ -44,9 +44,10 @@ static void add_egg_to_tile(server_t *server, egg_t *egg)
     }
     printf("DEBUG: Starting to add egg to tile (%d,%d)\n",
         egg->x, egg->y);
-    egg->next = NULL;
     if (tile->eggs) {
         egg->next = tile->eggs;
+    } else {
+        egg->next = NULL;
     }
     tile->eggs = egg;
     printf("DEBUG: Added egg ID %d to tile (%d,%d)\n",

@@ -78,14 +78,16 @@ void eject_single_player(server_t *server, player_t *ejector,
 void cmd_eject(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;
+    int ejected_count = 0;
 
     (void)args;
     if (!player) {
         network_send(client, "ko\n");
         return;
     }
-    eject_other_players(server, player);
+    ejected_count = eject_other_players(server, player);
     destroy_eggs_on_tile(server, player->x, player->y);
+    if (ejected_count > 0)
+        gui_broadcast_player_expulsion(server, player);
     network_send(client, "ok\n");
-    gui_broadcast_player_action(server, player, "eject");
 }

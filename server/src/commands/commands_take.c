@@ -46,6 +46,7 @@ void cmd_take(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;
     char *resource_name = args[1];
+    int resource_index = 0;
 
     if (!validate_take_request(client, args))
         return;
@@ -53,7 +54,9 @@ void cmd_take(server_t *server, client_t *client, char **args)
         network_send(client, "ko\n");
         return;
     }
+    resource_index = get_resource_index_by_name(resource_name);
     execute_take_action(server, player, resource_name);
     network_send(client, "ok\n");
-    gui_broadcast_player_action(server, player, "take");
+    gui_broadcast_resource_collect(server, player, resource_index);
+    gui_broadcast_player_inventory(server, player);
 }

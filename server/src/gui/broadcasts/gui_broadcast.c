@@ -261,14 +261,6 @@ void gui_broadcast_server_message(server_t *server, const char *message)
     printf("DEBUG: Broadcasted server message: %s\n", message);
 }
 
-/*
-** EPITECH PROJECT, 2025
-** Zappy
-** File description:
-** GUI broadcast player action function
-** À ajouter dans server/src/gui/broadcasts/gui_broadcast.c
-*/
-
 static action_type_t get_action_type(const char *action_str)
 {
     if (strcmp(action_str, "move") == 0)
