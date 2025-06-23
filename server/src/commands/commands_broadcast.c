@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Broadcast command implementation with sound direction calculation
+** commands_broadcast
 */
 
 #include "server.h"
@@ -12,10 +12,12 @@ static int calculate_shortest_distance(int emitter_pos, int listener_pos,
 {
     int direct_distance = emitter_pos - listener_pos;
     int wrap_distance = 0;
+    int half_world = world_size / 2;
+    int neg_half_world = -half_world;
 
-    if (direct_distance > world_size / 2)
+    if (direct_distance > half_world)
         wrap_distance = direct_distance - world_size;
-    else if (direct_distance < -world_size / 2)
+    else if (direct_distance < neg_half_world)
         wrap_distance = direct_distance + world_size;
     else
         wrap_distance = direct_distance;
@@ -103,8 +105,6 @@ void send_broadcast_to_listeners(server_t *server,
             snprintf(response, sizeof(response), "message %d, %s\n",
                 direction, message);
             network_send(current, response);
-            printf("DEBUG: Sent to player %d: direction %d\n",
-                current->player->id, direction);
         }
         current = current->next;
     }
@@ -120,7 +120,6 @@ void cmd_broadcast(server_t *server, client_t *client, char **args)
         return;
     }
     message = reconstruct_broadcast_message(args);
-    printf("DEBUG: Player %d broadcasting: '%s'\n", emitter->id, message);
     send_broadcast_to_listeners(server, emitter, message);
     network_send(client, "ok\n");
 }

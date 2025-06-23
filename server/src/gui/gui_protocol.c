@@ -5,77 +5,85 @@
 ** gui_protocol
 */
 
-#include "server.h"
+#include "gui.h"
 
-void gui_send_map_size(server_t *server, client_t *client)
+static const gui_handler_t GUI_HANDLERS[] = {
+    {"msz", gui_cmd_msz, false},
+    {"bct", gui_cmd_bct, true},
+    {"mct", gui_cmd_mct, false},
+    {"tna", gui_cmd_tna, false},
+    {"ppo", gui_cmd_ppo, true},
+    {"plv", gui_cmd_plv, true},
+    {"pin", gui_cmd_pin, true},
+    {"sgt", gui_cmd_sgt, false},
+    {"sst", gui_cmd_sst, true},
+    {NULL, NULL, false}
+};
+
+static const gui_handler_t *find_gui_handler(const char *command)
 {
-    char buffer[64];
+    int i = 0;
 
-    snprintf(buffer, sizeof(buffer), "msz %d %d\n",
-        server->game->width, server->game->height);
-    network_send(client, buffer);
-}
-
-void gui_send_tile_content(server_t *server, client_t *client, int x, int y)
-{
-    tile_t *tile = game_get_tile(server->game, x, y);
-    char buffer[256];
-
-    if (!tile)
-        return;
-    snprintf(buffer, sizeof(buffer), "bct %d %d %d %d %d %d %d %d %d\n",
-        x, y, tile->resources[0], tile->resources[1], tile->resources[2],
-        tile->resources[3], tile->resources[4], tile->resources[5],
-        tile->resources[6]);
-    network_send(client, buffer);
-}
-
-void gui_send_teams(server_t *server, client_t *client)
-{
-    team_t *team = server->game->teams;
-    char buffer[128];
-
-    while (team) {
-        snprintf(buffer, sizeof(buffer), "tna %s\n", team->name);
-        network_send(client, buffer);
-        team = team->next;
+    if (!command)
+        return NULL;
+    for (i = 0; GUI_HANDLERS[i].command; i++) {
+        if (strcmp(GUI_HANDLERS[i].command, command) == 0)
+            return &GUI_HANDLERS[i];
     }
+    return NULL;
 }
 
-void gui_send_player_position(server_t *server, client_t *client,
-    player_t *player)
+static bool validate_gui_command(const gui_handler_t *handler, char **args)
 {
-    char buffer[128];
-
-    (void)server;
-    if (!player)
-        return;
-    snprintf(buffer, sizeof(buffer), "ppo #%d %d %d %d\n",
-        player->id, player->x, player->y, player->orientation);
-    network_send(client, buffer);
-}
-
-static void broadcast_to_gui_clients(server_t *server, const char *msg)
-{
-    client_t *client = server->clients;
-
-    while (client) {
-        if (client->type == CLIENT_GRAPHIC)
-            network_send(client, msg);
-        client = client->next;
+    if (!handler->need_args)
+        return true;
+    if (!args || !args[1]) {
+        printf("DEBUG: GUI command needs arguments but none provided\n");
+        return false;
     }
+    return true;
 }
 
-void gui_broadcast_player_action(server_t *server, player_t *player,
-    const char *action)
+static void execute_gui_command(server_t *server, client_t *client,
+    const gui_handler_t *handler, char **args)
 {
-    char buffer[128];
+    printf("DEBUG: Executing GUI command '%s'\n", handler->command);
+    handler->handler(server, client, args);
+}
 
-    if (!player)
+void gui_handle_command(server_t *server, client_t *client, const char *line)
+{
+    char **args = str_split(line, ' ');
+    const gui_handler_t *handler = NULL;
+
+    if (!args || !args[0]) {
+        gui_send_unknown_command(client);
+        free_array(args);
         return;
-    if (strcmp(action, "move") == 0 || strcmp(action, "turn") == 0) {
-        snprintf(buffer, sizeof(buffer), "ppo #%d %d %d %d\n",
-            player->id, player->x, player->y, player->orientation);
-        broadcast_to_gui_clients(server, buffer);
     }
+    printf("DEBUG: GUI received command: '%s'\n", args[0]);
+    handler = find_gui_handler(args[0]);
+    if (!handler) {
+        printf("DEBUG: Unknown GUI command: '%s'\n", args[0]);
+        gui_send_unknown_command(client);
+        free_array(args);
+        return;
+    }
+    if (!validate_gui_command(handler, args)) {
+        gui_send_bad_parameters(client);
+        free_array(args);
+        return;
+    }
+    execute_gui_command(server, client, handler, args);
+    free_array(args);
+}
+
+void gui_send_unknown_command(client_t *client)
+{
+    network_send(client, "suc\n");
+}
+
+void gui_send_bad_parameters(client_t *client)
+{
+    network_send(client, "sbp\n");
 }

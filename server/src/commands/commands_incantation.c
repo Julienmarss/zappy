@@ -41,11 +41,8 @@ static bool check_player_requirements(server_t *server, player_t *player)
     elevation_req_t req = ELEVATION_REQUIREMENTS[player->level - 1];
     int same_level_count = count_same_level_players(server, player);
 
-    if (same_level_count < req.nb_players) {
-        printf("DEBUG: Not enough players of level %d (need %d, have %d)\n",
-            player->level, req.nb_players, same_level_count);
+    if (same_level_count < req.nb_players)
         return false;
-    }
     return true;
 }
 
@@ -56,16 +53,18 @@ static bool check_resource_requirements(server_t *server, player_t *player)
 
     if (!tile)
         return false;
-    if (tile->resources[LINEMATE] < req.linemate ||
-        tile->resources[DERAUMERE] < req.deraumere ||
-        tile->resources[SIBUR] < req.sibur ||
-        tile->resources[MENDIANE] < req.mendiane ||
-        tile->resources[PHIRAS] < req.phiras ||
-        tile->resources[THYSTAME] < req.thystame) {
-        printf("DEBUG: Not enough resources on tile for level %d\n",
-            player->level);
+    if (tile->resources[LINEMATE] < req.linemate)
         return false;
-    }
+    if (tile->resources[DERAUMERE] < req.deraumere)
+        return false;
+    if (tile->resources[SIBUR] < req.sibur)
+        return false;
+    if (tile->resources[MENDIANE] < req.mendiane)
+        return false;
+    if (tile->resources[PHIRAS] < req.phiras)
+        return false;
+    if (tile->resources[THYSTAME] < req.thystame)
+        return false;
     return true;
 }
 
@@ -82,33 +81,29 @@ static void consume_elevation_resources(server_t *server, player_t *player)
     tile->resources[MENDIANE] -= req.mendiane;
     tile->resources[PHIRAS] -= req.phiras;
     tile->resources[THYSTAME] -= req.thystame;
-    printf("DEBUG: Consumed resources for elevation to level %d\n",
-        player->level + 1);
+}
+
+static void elevate_single_player(player_t *player)
+{
+    char message[64];
+
+    player->level++;
+    snprintf(message, sizeof(message),
+        "Elevation underway\nCurrent level: %d\n", player->level);
+    if (player->client)
+        network_send(player->client, message);
 }
 
 static void elevate_same_level_players(server_t *server, player_t *initiator)
 {
     tile_t *tile = game_get_tile(server->game, initiator->x, initiator->y);
-    char message[64];
-    int elevated_count = 0;
 
     if (!tile)
         return;
     for (int i = 0; i < tile->player_count; i++) {
-        if (tile->players[i]->level == initiator->level) {
-            tile->players[i]->level++;
-            snprintf(message, sizeof(message),
-                "Elevation underway\nCurrent level: %d\n",
-                tile->players[i]->level);
-            if (tile->players[i]->client)
-                network_send(tile->players[i]->client, message);
-            elevated_count++;
-            printf("DEBUG: Player %d elevated to level %d\n",
-                tile->players[i]->id, tile->players[i]->level);
-        }
+        if (tile->players[i]->level == initiator->level)
+            elevate_single_player(tile->players[i]);
     }
-    printf("DEBUG: Elevated %d players from level %d to %d\n",
-        elevated_count, initiator->level, initiator->level + 1);
 }
 
 static bool validate_incantation_request(client_t *client)
@@ -118,8 +113,6 @@ static bool validate_incantation_request(client_t *client)
         return false;
     }
     if (check_max_level(client->player->level)) {
-        printf("DEBUG: Player %d already at max level %d\n",
-            client->player->id, client->player->level);
         network_send(client, "ko\n");
         return false;
     }
@@ -146,8 +139,6 @@ void cmd_incantation(server_t *server, client_t *client, char **args)
     (void)args;
     if (!validate_incantation_request(client))
         return;
-    printf("DEBUG: Player %d attempting incantation at level %d\n",
-        player->id, player->level);
     if (!check_incantation_requirements(server, player))
         return;
     consume_elevation_resources(server, player);

@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui.h"
 
 static command_t *create_command(const char *line)
 {
@@ -55,6 +56,13 @@ static void handle_player_client(client_t *client, const char *line)
     }
 }
 
+static void handle_graphic_client(server_t *server, client_t *client,
+    const char *line)
+{
+    printf("DEBUG: GUI client sent command: '%s'\n", line);
+    gui_handle_command(server, client, line);
+}
+
 void network_handle_client_line(server_t *server, client_t *client,
     const char *line)
 {
@@ -62,6 +70,13 @@ void network_handle_client_line(server_t *server, client_t *client,
         handle_unknown_client(server, client, line);
         return;
     }
-    if (client->type == CLIENT_PLAYER)
+    if (client->type == CLIENT_PLAYER) {
         handle_player_client(client, line);
+        return;
+    }
+    if (client->type == CLIENT_GRAPHIC) {
+        handle_graphic_client(server, client, line);
+        return;
+    }
+    printf("DEBUG: Unknown client type: %d\n", client->type);
 }

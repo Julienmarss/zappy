@@ -40,6 +40,7 @@ SRCS	=	src/main.c				\
 		src/commands/commands_utils.c		\
 		src/commands/commands_fork.c		\
 		src/commands/commands_eject.c		\
+		src/commands/commands_eject_utils.c		\
 		src/commands/commands_incantation.c		\
 		src/commands/commands_broadcast.c		\
 		src/commands/commands_look.c		\

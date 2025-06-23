@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Main server header
+** Main server header - Updated with GUI support
 */
 
 #ifndef SERVER_H_
@@ -265,15 +265,6 @@ void cmd_take(server_t *server, client_t *client, char **args);
 void cmd_set(server_t *server, client_t *client, char **args);
 void cmd_incantation(server_t *server, client_t *client, char **args);
 
-// gui_protocol.c
-void gui_send_map_size(server_t *server, client_t *client);
-void gui_send_tile_content(server_t *server, client_t *client, int x, int y);
-void gui_send_teams(server_t *server, client_t *client);
-void gui_send_player_position(server_t *server, client_t *client,
-    player_t *player);
-void gui_broadcast_player_action(server_t *server, player_t *player,
-    const char *action);
-
 // utils.c
 void free_array(char **array);
 long get_time_microseconds(void);
@@ -291,21 +282,46 @@ const char *get_resource_name_by_index(int index);
 
 // commands_take.c
 void cmd_take(server_t *server, client_t *client, char **args);
+bool validate_take_request(client_t *client, char **args);
+bool check_resource_availability(server_t *server, player_t *player,
+    const char *resource_name);
+void execute_take_action(server_t *server, player_t *player,
+    const char *resource_name);
 
 // commands_set.c
 void cmd_set(server_t *server, client_t *client, char **args);
+bool validate_set_request(client_t *client, char **args);
+bool check_inventory_availability(player_t *player,
+    const char *resource_name);
+void execute_set_action(server_t *server, player_t *player,
+    const char *resource_name);
 
 // commands_fork.c
 void cmd_fork(server_t *server, client_t *client, char **args);
 
 // commands_eject.c
 void cmd_eject(server_t *server, client_t *client, char **args);
+int eject_other_players(server_t *server, player_t *ejector);
 
 // commands_incantation.c
 void cmd_incantation(server_t *server, client_t *client, char **args);
+bool validate_incantation_request(client_t *client);
+bool check_incantation_requirements(server_t *server, player_t *player);
+void consume_elevation_resources(server_t *server, player_t *player);
+void elevate_same_level_players(server_t *server, player_t *initiator);
+
+// commands_broadcast.c
+int calculate_sound_direction(server_t *server, player_t *listener,
+    int emitter_x, int emitter_y);
+char *reconstruct_broadcast_message(char **args);
+void send_broadcast_to_listeners(server_t *server, player_t *emitter,
+    char *message);
 
 // commands_look.c
 void build_player_vision(server_t *server, player_t *player, char *buffer);
 void build_tile_content(char *buffer, tile_t *tile, bool is_current_tile);
+
+// vision_system.c
+void move_player_forward(server_t *server, player_t *player);
 
 #endif /* !SERVER_H_ */

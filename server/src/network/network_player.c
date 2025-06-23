@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui.h"
 
 static player_t *setup_player_from_egg(server_t *server, team_t *team,
     egg_t *egg)
@@ -40,6 +41,36 @@ static egg_t *get_available_egg_from_team(team_t *team)
     return team->eggs;
 }
 
+static void remove_egg_from_team(team_t *team, egg_t *egg)
+{
+    egg_t **current = &team->eggs;
+
+    while (*current) {
+        if (*current == egg) {
+            *current = egg->next;
+            break;
+        }
+        current = &(*current)->next;
+    }
+}
+
+static void remove_egg_from_tile(server_t *server, egg_t *egg)
+{
+    tile_t *tile = game_get_tile(server->game, egg->x, egg->y);
+    egg_t **current = NULL;
+
+    if (!tile)
+        return;
+    current = &tile->eggs;
+    while (*current) {
+        if (*current == egg) {
+            *current = egg->next;
+            break;
+        }
+        current = &(*current)->next;
+    }
+}
+
 void network_reject_connection(server_t *server, client_t *client)
 {
     network_send(client, "ko\n");
@@ -64,6 +95,13 @@ void network_handle_player_connection(server_t *server, client_t *client,
     setup_player_client(client, player);
     network_send_connection_info(client, team, server->game->width,
         server->game->height);
+    gui_broadcast_egg_connection(server, egg);
+    gui_broadcast_new_player(server, player);
+    remove_egg_from_team(team, egg);
+    remove_egg_from_tile(server, egg);
+    free(egg);
+    printf("DEBUG: Player connected successfully: ID %d at (%d,%d)\n",
+        player->id, player->x, player->y);
 }
 
 void network_send_connection_info(client_t *client, team_t *team,

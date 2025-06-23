@@ -2,12 +2,10 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Vision content building - SAFE VERSION with buffer limits
+** vision_content
 */
 
 #include "server.h"
-
-#define MAX_BUFFER_SIZE 15000
 
 static const char *RESOURCE_NAMES[] = {
     "food",
@@ -50,18 +48,26 @@ static bool add_single_player_safe(char *buffer, bool *first)
     return true;
 }
 
+static void add_single_resource_type(char *buffer, int resource_index,
+    int count, bool *first)
+{
+    for (int j = 0; j < count; j++) {
+        if (!add_single_resource_safe(buffer, resource_index, first))
+            return;
+    }
+}
+
 static void add_tile_resources_safe(char *buffer, tile_t *tile, bool *first)
 {
-    int i = 0;
-    int count = 0;
     int added = 0;
+    int count = 0;
 
-    for (i = 0; i < NB_RESOURCES && added < 10; i++) {
-        for (count = 0; count < tile->resources[i] && added < 10; count++) {
-            if (!add_single_resource_safe(buffer, i, first))
-                return;
-            added++;
-        }
+    for (int i = 0; i < NB_RESOURCES && added < 10; i++) {
+        count = tile->resources[i];
+        if (count > 10 - added)
+            count = 10 - added;
+        add_single_resource_type(buffer, i, count, first);
+        added += count;
     }
 }
 

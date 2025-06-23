@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui.h"
 
 player_t *player_create(team_t *team, int x, int y)
 {
@@ -45,6 +46,24 @@ void player_add_to_tile(server_t *server, player_t *player)
         player->id, player->x, player->y, tile->player_count);
 }
 
+static void remove_player_from_tile(server_t *server, player_t *player)
+{
+    tile_t *tile = game_get_tile(server->game, player->x, player->y);
+    int i = 0;
+    int j = 0;
+
+    if (!tile)
+        return;
+    for (i = 0; i < tile->player_count; i++) {
+        if (tile->players[i] == player) {
+            for (j = i; j < tile->player_count - 1; j++)
+                tile->players[j] = tile->players[j + 1];
+            tile->player_count--;
+            break;
+        }
+    }
+}
+
 void player_destroy(player_t *player)
 {
     if (!player)
@@ -62,6 +81,8 @@ void player_die(server_t *server, player_t *player)
     if (!player)
         return;
     printf("DEBUG: Player ID %d is dying\n", player->id);
+    gui_broadcast_player_death(server, player);
+    remove_player_from_tile(server, player);
     for (client = server->clients; client; client = client->next) {
         if (client->player == player) {
             network_send(client, "dead\n");
