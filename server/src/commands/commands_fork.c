@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static egg_t *create_new_egg(server_t *server, player_t *player)
 {
@@ -76,4 +77,6 @@ void cmd_fork(server_t *server, client_t *client, char **args)
     add_egg_to_team(player->team, egg);
     add_egg_to_tile(server, egg);
     network_send(client, "ok\n");
+    gui_broadcast_player_fork(server, player);
+    gui_broadcast_egg_laid(server, egg, player);
 }

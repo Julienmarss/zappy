@@ -46,13 +46,22 @@ SRCS	=	src/main.c				\
 		src/commands/commands_look.c		\
 		src/commands/vision_system.c		\
 		src/commands/vision_content.c		\
+		src/commands/incantation/incantation_validation.c	\
+		src/commands/incantation/incantation_requirements.c	\
+		src/commands/incantation/incantation_execution.c	\
+		src/commands/incantation/incantation_game_end.c	\
 		src/gui/gui_protocol.c			\
 		src/gui/gui_map_commands.c		\
 		src/gui/gui_team_commands.c		\
 		src/gui/gui_player_commands.c		\
 		src/gui/gui_time_commands.c		\
 		src/gui/gui_utils.c			\
-		src/gui/broadcasts/gui_broadcast.c	\
+		src/gui/broadcasts/gui_broadcast_player.c		\
+		src/gui/broadcasts/gui_broadcast_action.c		\
+		src/gui/broadcasts/gui_broadcast_resource.c	\
+		src/gui/broadcasts/gui_broadcast_egg.c		\
+		src/gui/broadcasts/gui_broadcast_incantation.c	\
+		src/gui/broadcasts/gui_broadcast_game.c		\
 		src/utils/utils.c			\
 		src/utils/str_utils.c
 

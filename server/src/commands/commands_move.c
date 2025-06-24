@@ -99,7 +99,7 @@ void cmd_forward(server_t *server, client_t *client, char **args)
         player->x, player->y);
     move_player_forward(server, player);
     network_send(client, "ok\n");
-    gui_broadcast_player_action(server, player, "move");
+    gui_broadcast_player_position(server, player);
 }
 
 void cmd_right(server_t *server, client_t *client, char **args)
@@ -115,7 +115,7 @@ void cmd_right(server_t *server, client_t *client, char **args)
     player->orientation = (player->orientation % 4) + 1;
     printf("%d\n", player->orientation);
     network_send(client, "ok\n");
-    gui_broadcast_player_action(server, player, "turn");
+    gui_broadcast_player_position(server, player);
 }
 
 void cmd_left(server_t *server, client_t *client, char **args)
@@ -133,5 +133,5 @@ void cmd_left(server_t *server, client_t *client, char **args)
         player->orientation = 4;
     printf("%d\n", player->orientation);
     network_send(client, "ok\n");
-    gui_broadcast_player_action(server, player, "turn");
+    gui_broadcast_player_position(server, player);
 }

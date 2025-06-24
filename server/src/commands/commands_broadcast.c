@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static int calculate_shortest_distance(int emitter_pos, int listener_pos,
     int world_size)
@@ -119,7 +120,14 @@ void cmd_broadcast(server_t *server, client_t *client, char **args)
         network_send(client, "ko\n");
         return;
     }
+    if (!args[1]) {
+        network_send(client, "ko\n");
+        return;
+    }
     message = reconstruct_broadcast_message(args);
     send_broadcast_to_listeners(server, emitter, message);
     network_send(client, "ok\n");
+    gui_broadcast_player_broadcast(server, emitter, message);
+    printf("DEBUG: Broadcast from player %d: '%s'\n",
+        emitter->id, message);
 }
