@@ -24,19 +24,22 @@ static const gui_handler_t *find_gui_handler(const char *command)
 {
     int i = 0;
 
-    if (!command)
+    if (!command) {
         return NULL;
+    }
     for (i = 0; GUI_HANDLERS[i].command; i++) {
-        if (strcmp(GUI_HANDLERS[i].command, command) == 0)
+        if (strcmp(GUI_HANDLERS[i].command, command) == 0) {
             return &GUI_HANDLERS[i];
+        }
     }
     return NULL;
 }
 
 static bool validate_gui_command(const gui_handler_t *handler, char **args)
 {
-    if (!handler->need_args)
+    if (!handler->need_args) {
         return true;
+    }
     if (!args || !args[1]) {
         printf("DEBUG: GUI command needs arguments but none provided\n");
         return false;
@@ -51,26 +54,42 @@ static void execute_gui_command(server_t *server, client_t *client,
     handler->handler(server, client, args);
 }
 
+static bool process_gui_args(char **args, client_t *client)
+{
+    if (!args || !args[0]) {
+        gui_send_unknown_command(client);
+        return false;
+    }
+    printf("DEBUG: GUI received command: '%s'\n", args[0]);
+    return true;
+}
+
+static bool process_gui_handler(const gui_handler_t *handler, char **args,
+    client_t *client)
+{
+    if (!handler) {
+        printf("DEBUG: Unknown GUI command: '%s'\n", args[0]);
+        gui_send_unknown_command(client);
+        return false;
+    }
+    if (!validate_gui_command(handler, args)) {
+        gui_send_bad_parameters(client);
+        return false;
+    }
+    return true;
+}
+
 void gui_handle_command(server_t *server, client_t *client, const char *line)
 {
     char **args = str_split(line, ' ');
     const gui_handler_t *handler = NULL;
 
-    if (!args || !args[0]) {
-        gui_send_unknown_command(client);
+    if (!process_gui_args(args, client)) {
         free_array(args);
         return;
     }
-    printf("DEBUG: GUI received command: '%s'\n", args[0]);
     handler = find_gui_handler(args[0]);
-    if (!handler) {
-        printf("DEBUG: Unknown GUI command: '%s'\n", args[0]);
-        gui_send_unknown_command(client);
-        free_array(args);
-        return;
-    }
-    if (!validate_gui_command(handler, args)) {
-        gui_send_bad_parameters(client);
+    if (!process_gui_handler(handler, args, client)) {
         free_array(args);
         return;
     }

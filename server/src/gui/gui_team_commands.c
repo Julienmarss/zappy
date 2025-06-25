@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI team commands implementation
+** gui_team_commands
 */
 
 #include "gui_protocol.h"

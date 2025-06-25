@@ -39,16 +39,11 @@ void network_handle_graphic_connection(server_t *server, client_t *client)
 {
     printf("DEBUG: Setting up graphic client connection\n");
     client->type = CLIENT_GRAPHIC;
-    
     printf("DEBUG: Sending initial map data\n");
     send_initial_map_data(server, client);
-    
     printf("DEBUG: Sending initial player data\n");
     send_initial_player_data(server);
-    
     printf("DEBUG: Sending time unit\n");
     send_time_unit(server, client);
-    
     printf("DEBUG: Graphic client setup complete\n");
 }
-

@@ -322,4 +322,8 @@ void build_tile_content(char *buffer, tile_t *tile, bool is_current_tile);
 // vision_system.c
 void move_player_forward(server_t *server, player_t *player);
 
+// network_egg.c
+egg_t *get_available_egg_from_team(team_t *team);
+void cleanup_egg_resources(server_t *server, team_t *team, egg_t *egg);
+
 #endif /* !SERVER_H_ */

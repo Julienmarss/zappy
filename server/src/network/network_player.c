@@ -13,8 +13,9 @@ static player_t *setup_player_from_egg(server_t *server, team_t *team,
 {
     player_t *player = player_create(team, egg->x, egg->y);
 
-    if (!player)
+    if (!player) {
         return NULL;
+    }
     team->connected_clients++;
     player_add_to_tile(server, player);
     return player;
@@ -22,8 +23,9 @@ static player_t *setup_player_from_egg(server_t *server, team_t *team,
 
 static bool check_connection_validity(team_t *team, egg_t *egg)
 {
-    if (!egg || team->connected_clients >= team->max_clients)
+    if (!egg || team->connected_clients >= team->max_clients) {
         return false;
+    }
     return true;
 }
 
@@ -34,41 +36,16 @@ static void setup_player_client(client_t *client, player_t *player)
     client->type = CLIENT_PLAYER;
 }
 
-static egg_t *get_available_egg_from_team(team_t *team)
+static void finalize_connection(server_t *server, client_t *client,
+    egg_t *egg, player_t *player)
 {
-    if (!team->eggs)
-        return NULL;
-    return team->eggs;
-}
-
-static void remove_egg_from_team(team_t *team, egg_t *egg)
-{
-    egg_t **current = &team->eggs;
-
-    while (*current) {
-        if (*current == egg) {
-            *current = egg->next;
-            break;
-        }
-        current = &(*current)->next;
-    }
-}
-
-static void remove_egg_from_tile(server_t *server, egg_t *egg)
-{
-    tile_t *tile = game_get_tile(server->game, egg->x, egg->y);
-    egg_t **current = NULL;
-
-    if (!tile)
-        return;
-    current = &tile->eggs;
-    while (*current) {
-        if (*current == egg) {
-            *current = egg->next;
-            break;
-        }
-        current = &(*current)->next;
-    }
+    network_send_connection_info(client, player->team, server->game->width,
+        server->game->height);
+    gui_broadcast_egg_connection(server, egg);
+    gui_broadcast_new_player(server, player);
+    cleanup_egg_resources(server, player->team, egg);
+    printf("DEBUG: Player connected successfully: ID %d at (%d,%d)\n",
+        player->id, player->x, player->y);
 }
 
 void network_reject_connection(server_t *server, client_t *client)
@@ -93,15 +70,7 @@ void network_handle_player_connection(server_t *server, client_t *client,
         return;
     }
     setup_player_client(client, player);
-    network_send_connection_info(client, team, server->game->width,
-        server->game->height);
-    gui_broadcast_egg_connection(server, egg);
-    gui_broadcast_new_player(server, player);
-    remove_egg_from_team(team, egg);
-    remove_egg_from_tile(server, egg);
-    free(egg);
-    printf("DEBUG: Player connected successfully: ID %d at (%d,%d)\n",
-        player->id, player->x, player->y);
+    finalize_connection(server, client, egg, player);
 }
 
 void network_send_connection_info(client_t *client, team_t *team,

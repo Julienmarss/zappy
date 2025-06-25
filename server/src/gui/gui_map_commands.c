@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI map commands implementation
+** gui_map_commands
 */
 
 #include "gui_protocol.h"
@@ -33,28 +33,20 @@ static bool validate_tile_coordinates(server_t *server, int x, int y)
     return true;
 }
 
-void gui_cmd_bct(server_t *server, client_t *client, char **args)
+static bool validate_bct_args(char **args, client_t *client)
 {
-    int x = 0;
-    int y = 0;
-    tile_t *tile = NULL;
-    char response[MAX_GUI_RESPONSE];
-
     if (!args[1] || !args[2]) {
         gui_send_bad_parameters(client);
-        return;
+        return false;
     }
-    x = atoi(args[1]);
-    y = atoi(args[2]);
-    if (!validate_tile_coordinates(server, x, y)) {
-        gui_send_bad_parameters(client);
-        return;
-    }
-    tile = game_get_tile(server->game, x, y);
-    if (!tile) {
-        gui_send_bad_parameters(client);
-        return;
-    }
+    return true;
+}
+
+static void send_tile_content_response(client_t *client, tile_t *tile,
+    int x, int y)
+{
+    char response[MAX_GUI_RESPONSE];
+
     snprintf(response, sizeof(response),
         "bct %d %d %d %d %d %d %d %d %d\n",
         x, y,
@@ -69,14 +61,38 @@ void gui_cmd_bct(server_t *server, client_t *client, char **args)
     printf("DEBUG: Sent tile content for (%d,%d)\n", x, y);
 }
 
+void gui_cmd_bct(server_t *server, client_t *client, char **args)
+{
+    int x = 0;
+    int y = 0;
+    tile_t *tile = NULL;
+
+    if (!validate_bct_args(args, client)) {
+        return;
+    }
+    x = atoi(args[1]);
+    y = atoi(args[2]);
+    if (!validate_tile_coordinates(server, x, y)) {
+        gui_send_bad_parameters(client);
+        return;
+    }
+    tile = game_get_tile(server->game, x, y);
+    if (!tile) {
+        gui_send_bad_parameters(client);
+        return;
+    }
+    send_tile_content_response(client, tile, x, y);
+}
+
 static void send_single_tile_content(server_t *server, client_t *client,
     int x, int y)
 {
     tile_t *tile = game_get_tile(server->game, x, y);
     char response[MAX_GUI_RESPONSE];
 
-    if (!tile)
+    if (!tile) {
         return;
+    }
     snprintf(response, sizeof(response),
         "bct %d %d %d %d %d %d %d %d %d\n",
         x, y,

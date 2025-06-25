@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Incantation execution functions (1 public + 4 static)
+** incantation_execution
 */
 
 #include "incantation.h"
@@ -58,8 +58,15 @@ static void broadcast_player_updates(server_t *server, incantation_ctx_t *ctx)
 void execute_incantation_ritual(server_t *server, player_t *player,
     incantation_ctx_t *ctx)
 {
-    gui_broadcast_incantation_start(server, ctx->x, ctx->y, ctx->level,
-        ctx->participants, ctx->nb_participants);
+    incantation_data_t incantation_data = {
+        .x = ctx->x,
+        .y = ctx->y,
+        .level = ctx->level,
+        .players = ctx->participants,
+        .nb_players = ctx->nb_participants
+    };
+
+    gui_broadcast_incantation_start(server, &incantation_data);
     consume_elevation_resources(server, player);
     elevate_participants(ctx);
     gui_broadcast_incantation_end(server, ctx->x, ctx->y, true);

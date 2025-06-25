@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI broadcast functions for game state events (2 public + 0 static)
+** gui_broadcast_game
 */
 
 #include "gui_protocol.h"

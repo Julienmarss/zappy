@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Incantation requirements checking functions (3 public + 5 static)
+** incantation_requirements
 */
 
 #include "incantation.h"
@@ -63,6 +63,29 @@ static bool validate_tile_and_requirements(tile_t *tile,
     return tile != NULL && req != NULL;
 }
 
+static bool check_all_resources(tile_t *tile, const elevation_req_t *req)
+{
+    if (!check_single_resource(tile, LINEMATE, req->linemate)) {
+        return false;
+    }
+    if (!check_single_resource(tile, DERAUMERE, req->deraumere)) {
+        return false;
+    }
+    if (!check_single_resource(tile, SIBUR, req->sibur)) {
+        return false;
+    }
+    if (!check_single_resource(tile, MENDIANE, req->mendiane)) {
+        return false;
+    }
+    if (!check_single_resource(tile, PHIRAS, req->phiras)) {
+        return false;
+    }
+    if (!check_single_resource(tile, THYSTAME, req->thystame)) {
+        return false;
+    }
+    return true;
+}
+
 const elevation_req_t *get_elevation_requirements(int level)
 {
     if (level < 1 || level > 7) {
@@ -99,23 +122,5 @@ bool check_resource_requirements(server_t *server, player_t *player)
     if (!validate_tile_and_requirements(tile, req)) {
         return false;
     }
-    if (!check_single_resource(tile, LINEMATE, req->linemate)) {
-        return false;
-    }
-    if (!check_single_resource(tile, DERAUMERE, req->deraumere)) {
-        return false;
-    }
-    if (!check_single_resource(tile, SIBUR, req->sibur)) {
-        return false;
-    }
-    if (!check_single_resource(tile, MENDIANE, req->mendiane)) {
-        return false;
-    }
-    if (!check_single_resource(tile, PHIRAS, req->phiras)) {
-        return false;
-    }
-    if (!check_single_resource(tile, THYSTAME, req->thystame)) {
-        return false;
-    }
-    return true;
+    return check_all_resources(tile, req);
 }

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Game end condition checking functions (1 public + 2 static)
+** incantation_game_end
 */
 
 #include "incantation.h"

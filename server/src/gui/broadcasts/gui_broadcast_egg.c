@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI broadcast functions for egg events (3 public + 0 static)
+** gui_broadcast_egg
 */
 
 #include "gui_protocol.h"

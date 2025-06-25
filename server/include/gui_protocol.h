@@ -18,6 +18,14 @@ typedef struct s_gui_handler {
     bool need_args;
 } gui_handler_t;
 
+typedef struct incantation_data_s {
+    int x;
+    int y;
+    int level;
+    player_t **players;
+    int nb_players;
+} incantation_data_t;
+
 // gui_protocol.c
 void gui_handle_command(server_t *server, client_t *client, const char *line);
 void gui_send_unknown_command(client_t *client);
@@ -72,8 +80,8 @@ void gui_broadcast_egg_connection(server_t *server, egg_t *egg);
 void gui_broadcast_egg_death(server_t *server, egg_t *egg);
 
 // gui_broadcast_incantation.c
-void gui_broadcast_incantation_start(server_t *server, int x, int y, int level,
-    player_t **players, int nb_players);
+void gui_broadcast_incantation_start(server_t *server,
+    incantation_data_t *data);
 void gui_broadcast_incantation_end(server_t *server, int x, int y,
     bool result);
 

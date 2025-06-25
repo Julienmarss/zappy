@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Incantation validation functions (2 public + 2 static)
+** incantation_validation
 */
 
 #include "incantation.h"

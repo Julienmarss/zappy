@@ -46,18 +46,26 @@ void player_add_to_tile(server_t *server, player_t *player)
         player->id, player->x, player->y, tile->player_count);
 }
 
+static void shift_players_array(tile_t *tile, int start_index)
+{
+    int j = 0;
+
+    for (j = start_index; j < tile->player_count - 1; j++) {
+        tile->players[j] = tile->players[j + 1];
+    }
+}
+
 static void remove_player_from_tile(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
     int i = 0;
-    int j = 0;
 
-    if (!tile)
+    if (!tile) {
         return;
+    }
     for (i = 0; i < tile->player_count; i++) {
         if (tile->players[i] == player) {
-            for (j = i; j < tile->player_count - 1; j++)
-                tile->players[j] = tile->players[j + 1];
+            shift_players_array(tile, i);
             tile->player_count--;
             break;
         }

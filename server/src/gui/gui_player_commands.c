@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI player commands implementation
+** gui_player_commands
 */
 
 #include "gui_protocol.h"
@@ -21,27 +21,42 @@ static player_t *find_player_by_id(server_t *server, int player_id)
     return NULL;
 }
 
-void gui_cmd_ppo(server_t *server, client_t *client, char **args)
+static bool validate_player_id_arg(char **args, client_t *client)
 {
-    int player_id = 0;
-    player_t *player = NULL;
-    char response[MAX_GUI_RESPONSE];
-
     if (!args[1]) {
         gui_send_bad_parameters(client);
-        return;
+        return false;
     }
     if (args[1][0] != '#') {
         gui_send_bad_parameters(client);
-        return;
+        return false;
+    }
+    return true;
+}
+
+static player_t *get_player_from_args(server_t *server, client_t *client,
+    char **args)
+{
+    int player_id = 0;
+    player_t *player = NULL;
+
+    if (!validate_player_id_arg(args, client)) {
+        return NULL;
     }
     player_id = atoi(args[1] + 1);
     player = find_player_by_id(server, player_id);
     if (!player) {
         printf("DEBUG: Player ID %d not found\n", player_id);
         gui_send_bad_parameters(client);
-        return;
+        return NULL;
     }
+    return player;
+}
+
+static void send_player_position_response(client_t *client, player_t *player)
+{
+    char response[MAX_GUI_RESPONSE];
+
     snprintf(response, sizeof(response), "ppo #%d %d %d %d\n",
         player->id, player->x, player->y, player->orientation);
     network_send(client, response);
@@ -49,27 +64,10 @@ void gui_cmd_ppo(server_t *server, client_t *client, char **args)
         player->id, player->x, player->y, player->orientation);
 }
 
-void gui_cmd_plv(server_t *server, client_t *client, char **args)
+static void send_player_level_response(client_t *client, player_t *player)
 {
-    int player_id = 0;
-    player_t *player = NULL;
     char response[MAX_GUI_RESPONSE];
 
-    if (!args[1]) {
-        gui_send_bad_parameters(client);
-        return;
-    }
-    if (args[1][0] != '#') {
-        gui_send_bad_parameters(client);
-        return;
-    }
-    player_id = atoi(args[1] + 1);
-    player = find_player_by_id(server, player_id);
-    if (!player) {
-        printf("DEBUG: Player ID %d not found\n", player_id);
-        gui_send_bad_parameters(client);
-        return;
-    }
     snprintf(response, sizeof(response), "plv #%d %d\n",
         player->id, player->level);
     network_send(client, response);
@@ -77,38 +75,48 @@ void gui_cmd_plv(server_t *server, client_t *client, char **args)
         player->id, player->level);
 }
 
-void gui_cmd_pin(server_t *server, client_t *client, char **args)
+static void send_player_inventory_response(client_t *client, player_t *player)
 {
-    int player_id = 0;
-    player_t *player = NULL;
     char response[MAX_GUI_RESPONSE];
 
-    if (!args[1]) {
-        gui_send_bad_parameters(client);
-        return;
-    }
-    if (args[1][0] != '#') {
-        gui_send_bad_parameters(client);
-        return;
-    }
-    player_id = atoi(args[1] + 1);
-    player = find_player_by_id(server, player_id);
-    if (!player) {
-        printf("DEBUG: Player ID %d not found\n", player_id);
-        gui_send_bad_parameters(client);
-        return;
-    }
     snprintf(response, sizeof(response),
         "pin #%d %d %d %d %d %d %d %d %d %d\n",
         player->id, player->x, player->y,
-        player->inventory[FOOD],
-        player->inventory[LINEMATE],
-        player->inventory[DERAUMERE],
-        player->inventory[SIBUR],
-        player->inventory[MENDIANE],
-        player->inventory[PHIRAS],
+        player->inventory[FOOD], player->inventory[LINEMATE],
+        player->inventory[DERAUMERE], player->inventory[SIBUR],
+        player->inventory[MENDIANE], player->inventory[PHIRAS],
         player->inventory[THYSTAME]);
     network_send(client, response);
     printf("DEBUG: Sent player inventory for ID %d at (%d,%d)\n",
         player->id, player->x, player->y);
+}
+
+void gui_cmd_ppo(server_t *server, client_t *client, char **args)
+{
+    player_t *player = get_player_from_args(server, client, args);
+
+    if (!player) {
+        return;
+    }
+    send_player_position_response(client, player);
+}
+
+void gui_cmd_plv(server_t *server, client_t *client, char **args)
+{
+    player_t *player = get_player_from_args(server, client, args);
+
+    if (!player) {
+        return;
+    }
+    send_player_level_response(client, player);
+}
+
+void gui_cmd_pin(server_t *server, client_t *client, char **args)
+{
+    player_t *player = get_player_from_args(server, client, args);
+
+    if (!player) {
+        return;
+    }
+    send_player_inventory_response(client, player);
 }

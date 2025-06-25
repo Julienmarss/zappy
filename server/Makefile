@@ -30,6 +30,7 @@ SRCS	=	src/main.c				\
 		src/network/network_client.c		\
 		src/network/network_player.c		\
 		src/network/network_gui.c		\
+		src/network/network_egg.c		\
 		src/network/network_commands.c		\
 		src/parser/args_parser.c		\
 		src/parser/args_teams.c        \

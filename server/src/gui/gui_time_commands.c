@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI time commands implementation
+** gui_time_commands
 */
 
 #include "gui_protocol.h"

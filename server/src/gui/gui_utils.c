@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GUI utility functions
+** gui_utils
 */
 
 #include "gui_protocol.h"
