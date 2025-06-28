@@ -45,8 +45,10 @@ SRCS	=	src/main.c				\
 		src/commands/commands_incantation.c		\
 		src/commands/commands_broadcast.c		\
 		src/commands/commands_look.c		\
-		src/commands/vision_system.c		\
-		src/commands/vision_content.c		\
+		src/commands/vision/vision_builder.c		\
+		src/commands/vision/vision_coordinates.c		\
+		src/commands/vision/vision_formatter.c		\
+		src/commands/vision/vision_pattern.c		\
 		src/commands/incantation/incantation_validation.c	\
 		src/commands/incantation/incantation_requirements.c	\
 		src/commands/incantation/incantation_execution.c	\
