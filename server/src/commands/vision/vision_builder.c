@@ -7,13 +7,14 @@
 
 #include "vision.h"
 
-static int calculate_vision_tile_count(int level)
+static int calculate_tile_count(int level)
 {
     int total = 0;
 
-    for (int row = 0; row <= level; row++) {
+    if (level < 1 || level > 8)
+        level = 1;
+    for (int row = 0; row <= level; row++)
         total += (2 * row + 1);
-    }
     return total;
 }
 
@@ -24,7 +25,7 @@ static vision_data_t *allocate_vision_data(int level)
 
     if (!data)
         return NULL;
-    tile_count = calculate_vision_tile_count(level);
+    tile_count = calculate_tile_count(level);
     data->tiles = malloc(sizeof(vision_tile_t) * tile_count);
     if (!data->tiles) {
         free(data);
@@ -33,9 +34,9 @@ static vision_data_t *allocate_vision_data(int level)
     return data;
 }
 
-static void initialize_vision_data(vision_data_t *data, int level)
+static void init_vision_data(vision_data_t *data, int level)
 {
-    data->tile_count = calculate_vision_tile_count(level);
+    data->tile_count = calculate_tile_count(level);
     data->level = level;
 }
 
@@ -45,7 +46,7 @@ vision_data_t *vision_create_data(int level)
 
     if (!data)
         return NULL;
-    initialize_vision_data(data, level);
+    init_vision_data(data, level);
     return data;
 }
 
@@ -53,6 +54,7 @@ void vision_destroy_data(vision_data_t *data)
 {
     if (!data)
         return;
-    free(data->tiles);
+    if (data->tiles)
+        free(data->tiles);
     free(data);
 }

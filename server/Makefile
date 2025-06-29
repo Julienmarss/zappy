@@ -49,6 +49,8 @@ SRCS	=	src/main.c				\
 		src/commands/vision/vision_coordinates.c		\
 		src/commands/vision/vision_formatter.c		\
 		src/commands/vision/vision_pattern.c		\
+        src/commands/vision/vision_tile_content.c		\
+        src/commands/vision/vision_utils.c		\
 		src/commands/incantation/incantation_validation.c	\
 		src/commands/incantation/incantation_requirements.c	\
 		src/commands/incantation/incantation_execution.c	\

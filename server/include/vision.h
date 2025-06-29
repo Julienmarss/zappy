@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** vision
+** vision system header
 */
 
 #ifndef VISION_H_
@@ -22,6 +22,23 @@ typedef struct vision_data_s {
     int level;
 } vision_data_t;
 
+typedef struct vision_transform_s {
+    int orientation;
+    int local_x;
+    int local_y;
+} vision_transform_t;
+
+typedef struct vision_format_s {
+    server_t *server;
+    player_t *player;
+    vision_data_t *data;
+} vision_format_t;
+
+typedef struct content_context_s {
+    char *buffer;
+    bool *first;
+} content_context_t;
+
 // vision_builder.c
 vision_data_t *vision_create_data(int level);
 void vision_destroy_data(vision_data_t *data);
@@ -30,10 +47,19 @@ void vision_destroy_data(vision_data_t *data);
 void vision_calculate_tiles(vision_data_t *data);
 
 // vision_coordinates.c
-void vision_apply_orientation(int orientation, int dx, int *world_dx);
+void vision_transform_coordinates(vision_transform_t *transform,
+    int *world_x, int *world_y);
 
 // vision_formatter.c
-void vision_format_response(server_t *server, player_t *player, vision_data_t *data, char *buffer);
-void vision_format_tile_content(server_t *server, int x, int y, char *buffer);
+void vision_format_response(vision_format_t *format, char *buffer);
+
+// vision_tile_content.c
+void vision_format_tile_content(server_t *server, int x, int y,
+    char *buffer);
+
+// vision_utils.c
+int vision_count_players_at_position(server_t *server, int x, int y);
+void vision_get_world_coordinates(vision_format_t *format, int tile_index,
+    int *world_x, int *world_y);
 
 #endif /* !VISION_H_ */

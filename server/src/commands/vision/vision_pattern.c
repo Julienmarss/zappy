@@ -7,33 +7,34 @@
 
 #include "vision.h"
 
-static void add_pattern_row(vision_data_t *data, int *index, int row)
+static void add_tile(vision_data_t *data, int *index, int x, int y)
 {
-    for (int col = -row; col <= row; col++) {
-        if (*index >= data->tile_count)
-            return;
-        data->tiles[*index].x = col;
-        data->tiles[*index].y = -row;
-        data->tiles[*index].index = *index;
-        (*index)++;
-    }
+    if (*index >= data->tile_count)
+        return;
+    data->tiles[*index].x = x;
+    data->tiles[*index].y = y;
+    data->tiles[*index].index = *index;
+    (*index)++;
 }
 
-static void build_vision_pattern(vision_data_t *data)
+static void add_row(vision_data_t *data, int *index, int row)
+{
+    for (int col = -row; col <= row; col++)
+        add_tile(data, index, col, -row);
+}
+
+static void build_pattern(vision_data_t *data)
 {
     int index = 0;
-    int level = data->level;
 
-    data->tiles[0].x = 0;
-    data->tiles[0].y = 0;
-    data->tiles[0].index = 0;
-    index = 1;
-    for (int row = 1; row <= level; row++) {
-        add_pattern_row(data, &index, row);
-    }
+    add_tile(data, &index, 0, 0);
+    for (int row = 1; row <= data->level; row++)
+        add_row(data, &index, row);
 }
 
 void vision_calculate_tiles(vision_data_t *data)
 {
-    build_vision_pattern(data);
+    if (!data)
+        return;
+    build_pattern(data);
 }

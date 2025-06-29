@@ -7,49 +7,49 @@
 
 #include "vision.h"
 
-static void apply_north_orientation(int dx, int dy, int *world_dx, int *world_dy)
+static void transform_north(int dx, int dy, int *wx, int *wy)
 {
-    *world_dx = dx;
-    *world_dy = dy;
+    *wx = dx;
+    *wy = dy;
 }
 
-static void apply_east_orientation(int dx, int dy, int *world_dx, int *world_dy)
+static void transform_east(int dx, int dy, int *wx, int *wy)
 {
-    *world_dx = -dy;
-    *world_dy = dx;
+    *wx = -dy;
+    *wy = dx;
 }
 
-static void apply_south_orientation(int dx, int dy, int *world_dx, int *world_dy)
+static void transform_south(int dx, int dy, int *wx, int *wy)
 {
-    *world_dx = -dx;
-    *world_dy = -dy;
+    *wx = -dx;
+    *wy = -dy;
 }
 
-static void apply_west_orientation(int dx, int dy, int *world_dx, int *world_dy)
+static void transform_west(int dx, int dy, int *wx, int *wy)
 {
-    *world_dx = dy;
-    *world_dy = -dx;
+    *wx = dy;
+    *wy = -dx;
 }
 
-static void apply_default_orientation(int dx, int dy, int *world_dx, int *world_dy)
+void vision_transform_coordinates(vision_transform_t *transform,
+    int *world_x, int *world_y)
 {
-    (void)dx;
-    (void)dy;
-    *world_dx = 0;
-    *world_dy = 0;
-}
-
-void vision_apply_orientation(int orientation, int dx, int *world_dx)
-{
-    static void (*orientation_funcs[])(int, int, int*, int*) = {
-        apply_default_orientation,
-        apply_north_orientation,
-        apply_east_orientation,
-        apply_south_orientation,
-        apply_west_orientation
-    };
-    int index = (orientation >= 1 && orientation <= 4) ? orientation : 0;
-    int world_dy = 0;
-
-    orientation_funcs[index](dx, 0, world_dx, &world_dy);
+    switch (transform->orientation) {
+        case NORTH:
+            transform_north(transform->local_x, transform->local_y,
+                world_x, world_y);
+            break;
+        case EAST:
+            transform_east(transform->local_x, transform->local_y,
+                world_x, world_y);
+            break;
+        case SOUTH:
+            transform_south(transform->local_x, transform->local_y,
+                world_x, world_y);
+            break;
+        case WEST:
+            transform_west(transform->local_x, transform->local_y,
+                world_x, world_y);
+            break;
+    }
 }
