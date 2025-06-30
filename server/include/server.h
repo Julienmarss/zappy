@@ -174,17 +174,6 @@ struct s_server {
     long current_time;
 };
 
-typedef struct elevation_req_s {
-    int level;
-    int nb_players;
-    int linemate;
-    int deraumere;
-    int sibur;
-    int mendiane;
-    int phiras;
-    int thystame;
-} elevation_req_t;
-
 typedef struct s_position {
     int x;
     int y;
@@ -246,7 +235,7 @@ tile_t **create_map(int width, int height);
 void init_teams(game_t *game, char **teams, int nb_clients);
 
 // game_resources.c
-void game_spawn_resources(game_t *game);
+void game_spawn_resources(server_t *server);
 
 // player.c
 player_t *player_create(team_t *team, int x, int y);

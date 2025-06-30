@@ -8,6 +8,27 @@
 #include "incantation.h"
 #include "gui_protocol.h"
 
+static void broadcast_tile_content_after_incantation(server_t *server,
+    int x, int y)
+{
+    tile_t *tile = game_get_tile(server->game, x, y);
+    char message[MAX_GUI_RESPONSE];
+
+    if (!tile)
+        return;
+    snprintf(message, sizeof(message),
+        "bct %d %d %d %d %d %d %d %d %d\n",
+        x, y,
+        tile->resources[FOOD],
+        tile->resources[LINEMATE],
+        tile->resources[DERAUMERE],
+        tile->resources[SIBUR],
+        tile->resources[MENDIANE],
+        tile->resources[PHIRAS],
+        tile->resources[THYSTAME]);
+    gui_send_to_all_graphic_clients(server, message);
+}
+
 static void consume_elevation_resources(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
@@ -22,6 +43,7 @@ static void consume_elevation_resources(server_t *server, player_t *player)
     tile->resources[MENDIANE] -= req->mendiane;
     tile->resources[PHIRAS] -= req->phiras;
     tile->resources[THYSTAME] -= req->thystame;
+    broadcast_tile_content_after_incantation(server, player->x, player->y);
 }
 
 static void elevate_single_player(player_t *player)

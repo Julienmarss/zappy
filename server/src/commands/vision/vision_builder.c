@@ -36,6 +36,8 @@ static vision_data_t *allocate_vision_data(int level)
 
 static void init_vision_data(vision_data_t *data, int level)
 {
+    if (level < 1 || level > 8)
+        level = 1;
     data->tile_count = calculate_tile_count(level);
     data->level = level;
 }

@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "gui_protocol.h"
 
 static void handle_player_action_time(player_t *player)
 {
@@ -37,26 +38,25 @@ static void update_player_actions(server_t *server)
     }
 }
 
-static void consume_food_if_available(player_t *player)
+static void consume_food_if_available(server_t *server, player_t *player)
 {
     if (player->inventory[FOOD] > 0) {
         player->inventory[FOOD]--;
         player->food_timer = 126;
-        printf("DEBUG: Player ID %d consumed food, remaining: %d\n",
-            player->id, player->inventory[FOOD]);
+        gui_broadcast_player_inventory(server, player);
     } else {
         printf("DEBUG: Player ID %d starved to death\n", player->id);
     }
 }
 
-static void update_player_hunger(server_t *server, player_t *player)
+static void update_single_player_food(server_t *server, player_t *player)
 {
     player->food_timer--;
     printf("DEBUG: Player ID %d food timer: %d\n", player->id,
         player->food_timer);
     if (player->food_timer <= 0) {
         if (player->inventory[FOOD] > 0)
-            consume_food_if_available(player);
+            consume_food_if_available(server, player);
         else
             player_die(server, player);
     }
@@ -65,28 +65,25 @@ static void update_player_hunger(server_t *server, player_t *player)
 static void update_player_food(server_t *server)
 {
     client_t *client = server->clients;
-    static int food_tick = 0;
+    client_t *next_client = NULL;
 
-    food_tick++;
-    if (food_tick < 126)
-        return;
-    food_tick = 0;
     while (client) {
+        next_client = client->next;
         if (client->type == CLIENT_PLAYER && client->player)
-            update_player_hunger(server, client->player);
-        client = client->next;
+            update_single_player_food(server, client->player);
+        client = next_client;
     }
 }
 
 void game_update(server_t *server)
 {
-    static int tick = 0;
+    static int resource_spawn_tick = 0;
 
     update_player_actions(server);
     update_player_food(server);
-    tick++;
-    if (tick >= 20) {
-        game_spawn_resources(server->game);
-        tick = 0;
+    resource_spawn_tick++;
+    if (resource_spawn_tick >= 20) {
+        game_spawn_resources(server);
+        resource_spawn_tick = 0;
     }
 }

@@ -40,6 +40,29 @@ static void execute_take_action(server_t *server, player_t *player,
 
     tile->resources[resource_index]--;
     player->inventory[resource_index]++;
+    printf("DEBUG: Player ID %d took %s at (%d,%d), inventory now: %d\n",
+        player->id, resource_name, player->x, player->y,
+        player->inventory[resource_index]);
+}
+
+static void broadcast_tile_content_change(server_t *server, player_t *player)
+{
+    tile_t *tile = game_get_tile(server->game, player->x, player->y);
+    char message[MAX_GUI_RESPONSE];
+
+    if (!tile)
+        return;
+    snprintf(message, sizeof(message),
+        "bct %d %d %d %d %d %d %d %d %d\n",
+        player->x, player->y,
+        tile->resources[FOOD],
+        tile->resources[LINEMATE],
+        tile->resources[DERAUMERE],
+        tile->resources[SIBUR],
+        tile->resources[MENDIANE],
+        tile->resources[PHIRAS],
+        tile->resources[THYSTAME]);
+    gui_send_to_all_graphic_clients(server, message);
 }
 
 void cmd_take(server_t *server, client_t *client, char **args)
@@ -59,4 +82,5 @@ void cmd_take(server_t *server, client_t *client, char **args)
     network_send(client, "ok\n");
     gui_broadcast_resource_collect(server, player, resource_index);
     gui_broadcast_player_inventory(server, player);
+    broadcast_tile_content_change(server, player);
 }
