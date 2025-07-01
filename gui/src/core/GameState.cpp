@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** GameState
+*/
+
 #include "../../include/GameState.hpp"
 
 namespace Zappy {
@@ -197,9 +204,7 @@ void GameState::addTeam(const std::string& name)
     team.color = teamColors[teams.size() % teamColors.size()];
     teams[name] = team;
     
-    #ifdef DEBUG
-    std::cout << "GameState: Added team " << name << std::endl;
-    #endif
+    std::cout << "GameState: Added team " << name << " with color index " << teams.size()-1 << std::endl;
 }
 
 const TeamData* GameState::getTeam(const std::string& name) const

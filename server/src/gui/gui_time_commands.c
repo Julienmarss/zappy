@@ -5,8 +5,28 @@
 ** gui_time_commands
 */
 
+/**
+ * @file gui_time_commands.c
+ * @brief Commandes GUI liées au temps (`sgt`, `sst`) pour Zappy.
+ *
+ * Ce fichier implémente les commandes permettant de consulter et de modifier
+ * l'unité de temps du jeu via le protocole graphique.
+ */
+
 #include "gui_protocol.h"
 
+/**
+ * @brief Commande GUI `sgt` — Envoie l'unité de temps actuelle au client graphique.
+ *
+ * Format de réponse :
+ * ```
+ * sgt <time_unit>\n
+ * ```
+ *
+ * @param server Le serveur de jeu.
+ * @param client Le client graphique demandeur.
+ * @param args Arguments de la commande (ignorés ici).
+ */
 void gui_cmd_sgt(server_t *server, client_t *client, char **args)
 {
     char response[MAX_GUI_RESPONSE];
@@ -21,6 +41,12 @@ void gui_cmd_sgt(server_t *server, client_t *client, char **args)
     printf("DEBUG: Sent time unit to GUI: %d\n", server->game->time_unit);
 }
 
+/**
+ * @brief Vérifie si l’unité de temps est dans une plage valide (2–10000).
+ *
+ * @param time_unit Nouvelle unité de temps proposée.
+ * @return true si valide, false sinon.
+ */
 static bool validate_time_unit(int time_unit)
 {
     if (time_unit < 2 || time_unit > 10000) {
@@ -30,6 +56,22 @@ static bool validate_time_unit(int time_unit)
     return true;
 }
 
+/**
+ * @brief Commande GUI `sst` — Modifie l’unité de temps du jeu.
+ *
+ * Format attendu :
+ * ```
+ * sst <new_time_unit>\n
+ * ```
+ * Format de réponse :
+ * ```
+ * sst <new_time_unit>\n
+ * ```
+ *
+ * @param server Le serveur de jeu.
+ * @param client Le client graphique demandeur.
+ * @param args Arguments de la commande (doit contenir une valeur entière).
+ */
 void gui_cmd_sst(server_t *server, client_t *client, char **args)
 {
     int new_time_unit = 0;

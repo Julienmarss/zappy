@@ -1,8 +1,16 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** Protocol header
+*/
+
 #pragma once
 #include "Common.hpp"
 
 namespace Zappy {
     class GameState;
+    class Application;
 
     class ProtocolHandler {
     private:
@@ -22,11 +30,14 @@ namespace Zappy {
         void handleEggDeath(const std::vector<std::string>& tokens);
         void handleTimeUnit(const std::vector<std::string>& tokens);
         void handleEndGame(const std::vector<std::string>& tokens);
+        Application* application; 
 
     public:
         explicit ProtocolHandler(GameState* gameState);
         ~ProtocolHandler() = default;
 
         void processMessage(const std::string& message);
+        explicit ProtocolHandler(GameState* gameState, Application* app = nullptr);
+
     };
 }

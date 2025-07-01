@@ -5,8 +5,23 @@
 ** network
 */
 
+/**
+ * @file network.c
+ * @brief Implémente les fonctions de lecture/écriture réseau pour les clients du serveur Zappy.
+ */
+
 #include "server.h"
 
+/**
+ * @brief Envoie un message au client via son socket.
+ *
+ * Cette fonction copie le message dans le buffer d’écriture du client,
+ * puis tente immédiatement de l’envoyer via un appel à `write`.
+ *
+ * @param client Le client destinataire.
+ * @param msg Le message à envoyer (terminé par '\n').
+ * @return Nombre d'octets écrits, ou -1 en cas d’erreur de buffer plein.
+ */
 int network_send(client_t *client, const char *msg)
 {
     int len = strlen(msg);
@@ -28,6 +43,14 @@ int network_send(client_t *client, const char *msg)
     return written;
 }
 
+/**
+ * @brief Extrait une ligne terminée par `\n` du buffer de lecture du client.
+ *
+ * @param client Le client dont on veut extraire une ligne.
+ * @param line Le buffer dans lequel stocker la ligne extraite.
+ * @param max_len Taille maximale du buffer `line`.
+ * @return 1 si une ligne a été extraite, 0 sinon.
+ */
 static int extract_line(client_t *client, char *line, int max_len)
 {
     int i = 0;
@@ -45,6 +68,12 @@ static int extract_line(client_t *client, char *line, int max_len)
     return 0;
 }
 
+/**
+ * @brief Gère les codes de retour de `read` pour la lecture réseau.
+ *
+ * @param bytes Nombre de bytes lus.
+ * @return 1 si la lecture peut continuer, 0 si le client a fermé, -1 si erreur fatale.
+ */
 static int handle_read_result(int bytes)
 {
     if (bytes < 0) {
@@ -57,6 +86,16 @@ static int handle_read_result(int bytes)
     return bytes;
 }
 
+/**
+ * @brief Reçoit les données d’un client et traite les lignes complètes.
+ *
+ * Les lignes extraites sont immédiatement transmises à `network_handle_client_line`
+ * pour traitement. Si le socket est fermé ou en erreur, la fonction retourne 0 ou -1.
+ *
+ * @param server Le serveur.
+ * @param client Le client concerné.
+ * @return Nombre de bytes reçus, 0 si fermeture, -1 si erreur.
+ */
 int network_receive(server_t *server, client_t *client)
 {
     int bytes = 0;

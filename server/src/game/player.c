@@ -5,9 +5,22 @@
 ** player
 */
 
+/**
+ * @file player.c
+ * @brief Contient les fonctions de gestion des joueurs dans le jeu Zappy.
+ */
+
 #include "server.h"
 #include "gui_protocol.h"
 
+/**
+ * @brief Crée un nouveau joueur à une position donnée pour une équipe donnée.
+ *
+ * @param team Pointeur vers l'équipe du joueur.
+ * @param x Position X initiale.
+ * @param y Position Y initiale.
+ * @return Pointeur vers le joueur créé, ou NULL en cas d'erreur.
+ */
 player_t *player_create(team_t *team, int x, int y)
 {
     player_t *player = calloc(1, sizeof(player_t));
@@ -31,6 +44,12 @@ player_t *player_create(team_t *team, int x, int y)
     return player;
 }
 
+/**
+ * @brief Ajoute un joueur sur la tuile correspondante à sa position.
+ *
+ * @param server Pointeur vers la structure serveur.
+ * @param player Pointeur vers le joueur à ajouter.
+ */
 void player_add_to_tile(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
@@ -46,24 +65,32 @@ void player_add_to_tile(server_t *server, player_t *player)
         player->id, player->x, player->y, tile->player_count);
 }
 
+/**
+ * @brief Décale les joueurs dans la tuile à partir d'un index pour en supprimer un.
+ *
+ * @param tile Pointeur vers la tuile.
+ * @param start_index Index du joueur à supprimer.
+ */
 static void shift_players_array(tile_t *tile, int start_index)
 {
-    int j = 0;
-
-    for (j = start_index; j < tile->player_count - 1; j++) {
+    for (int j = start_index; j < tile->player_count - 1; j++) {
         tile->players[j] = tile->players[j + 1];
     }
 }
 
+/**
+ * @brief Retire un joueur de la tuile où il se trouve actuellement.
+ *
+ * @param server Pointeur vers la structure serveur.
+ * @param player Pointeur vers le joueur à retirer.
+ */
 static void remove_player_from_tile(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
-    int i = 0;
 
-    if (!tile) {
+    if (!tile)
         return;
-    }
-    for (i = 0; i < tile->player_count; i++) {
+    for (int i = 0; i < tile->player_count; i++) {
         if (tile->players[i] == player) {
             shift_players_array(tile, i);
             tile->player_count--;
@@ -72,6 +99,11 @@ static void remove_player_from_tile(server_t *server, player_t *player)
     }
 }
 
+/**
+ * @brief Détruit un joueur (libération mémoire + décrémentation équipe).
+ *
+ * @param player Pointeur vers le joueur à détruire.
+ */
 void player_destroy(player_t *player)
 {
     if (!player)
@@ -82,6 +114,12 @@ void player_destroy(player_t *player)
     free(player);
 }
 
+/**
+ * @brief Gère la mort d’un joueur (envoie "dead", suppression de la tuile, GUI...).
+ *
+ * @param server Pointeur vers le serveur.
+ * @param player Pointeur vers le joueur à tuer.
+ */
 void player_die(server_t *server, player_t *player)
 {
     client_t *client = NULL;
@@ -101,6 +139,12 @@ void player_die(server_t *server, player_t *player)
     player_destroy(player);
 }
 
+/**
+ * @brief Fonction de mise à jour du joueur (placeholder pour extension future).
+ *
+ * @param server Pointeur vers le serveur.
+ * @param player Pointeur vers le joueur à mettre à jour.
+ */
 void player_update(server_t *server, player_t *player)
 {
     (void)server;

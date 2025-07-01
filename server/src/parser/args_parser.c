@@ -5,8 +5,18 @@
 ** args_parser
 */
 
+/**
+ * @file args_parser.c
+ * @brief Gère le parsing des arguments de ligne de commande pour le serveur Zappy.
+ */
+
 #include "parser.h"
 
+/**
+ * @brief Affiche le message d'utilisation du programme.
+ *
+ * @param prog_name Le nom de l'exécutable (typiquement argv[0]).
+ */
 void print_usage(const char *prog_name)
 {
     printf("USAGE: %s -p port -x width -y height -n name1 name2 ... "
@@ -19,6 +29,12 @@ void print_usage(const char *prog_name)
     printf("\t-f freq\t\treciprocal of time unit for execution of actions\n");
 }
 
+/**
+ * @brief Valide les arguments fournis après parsing.
+ *
+ * @param args Structure contenant les arguments parsés.
+ * @return true si les arguments sont valides, false sinon.
+ */
 bool validate_arguments(args_t *args)
 {
     if (!args->teams || !args->teams[0]) {
@@ -37,6 +53,11 @@ bool validate_arguments(args_t *args)
     return true;
 }
 
+/**
+ * @brief Affiche la configuration actuelle du serveur.
+ *
+ * @param args Structure contenant les arguments de configuration.
+ */
 void print_configuration(args_t *args)
 {
     int i = 0;
@@ -51,6 +72,11 @@ void print_configuration(args_t *args)
     printf("Time unit: 1/%d seconds\n", args->freq);
 }
 
+/**
+ * @brief Initialise les valeurs par défaut des arguments.
+ *
+ * @param args Structure d’arguments à initialiser.
+ */
 static void init_default_args(args_t *args)
 {
     args->port = DEFAULT_PORT;
@@ -61,6 +87,14 @@ static void init_default_args(args_t *args)
     args->teams = NULL;
 }
 
+/**
+ * @brief Parse les arguments de la ligne de commande et les stocke dans la structure fournie.
+ *
+ * @param argc Nombre d’arguments.
+ * @param argv Tableau d’arguments.
+ * @param args Structure dans laquelle stocker les résultats.
+ * @return 0 si succès, sinon code d’erreur.
+ */
 int parse_arguments(int argc, char **argv, args_t *args)
 {
     int opt = 0;

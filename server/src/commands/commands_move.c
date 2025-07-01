@@ -5,9 +5,20 @@
 ** commands_move
 */
 
+/**
+ * @file commands_move.c
+ * @brief Implémente les commandes de déplacement des joueurs : forward, left, right.
+ */
+
 #include "server.h"
 #include "gui_protocol.h"
 
+/**
+ * @brief Décale vers la gauche les joueurs dans le tableau après suppression.
+ *
+ * @param tile Tuile concernée.
+ * @param start_index Index du joueur à supprimer.
+ */
 static void shift_players_left(tile_t *tile, int start_index)
 {
     for (int j = start_index; j < tile->player_count - 1; j++)
@@ -16,6 +27,12 @@ static void shift_players_left(tile_t *tile, int start_index)
     tile->player_count--;
 }
 
+/**
+ * @brief Supprime un joueur d'une tuile donnée.
+ *
+ * @param server Le serveur principal.
+ * @param player Le joueur à supprimer.
+ */
 static void remove_player_from_tile(server_t *server, player_t *player)
 {
     tile_t *old_tile = game_get_tile(server->game, player->x, player->y);
@@ -32,6 +49,12 @@ static void remove_player_from_tile(server_t *server, player_t *player)
     }
 }
 
+/**
+ * @brief Ajoute un joueur à sa nouvelle tuile après déplacement.
+ *
+ * @param server Le serveur principal.
+ * @param player Le joueur à ajouter.
+ */
 static void add_player_to_tile(server_t *server, player_t *player)
 {
     tile_t *new_tile = game_get_tile(server->game, player->x, player->y);
@@ -43,26 +66,33 @@ static void add_player_to_tile(server_t *server, player_t *player)
     printf("DEBUG: Added player to tile (%d,%d)\n", player->x, player->y);
 }
 
+/**
+ * @brief Calcule le déplacement en fonction de l'orientation du joueur.
+ *
+ * @param orientation Orientation du joueur.
+ * @param dx Résultat du déplacement horizontal.
+ * @param dy Résultat du déplacement vertical.
+ */
 static void calculate_movement_delta(int orientation, int *dx, int *dy)
 {
     *dx = 0;
     *dy = 0;
     switch (orientation) {
-        case NORTH:
-            *dy = -1;
-            break;
-        case SOUTH:
-            *dy = 1;
-            break;
-        case EAST:
-            *dx = 1;
-            break;
-        case WEST:
-            *dx = -1;
-            break;
+        case NORTH: *dy = -1; break;
+        case SOUTH: *dy = 1; break;
+        case EAST:  *dx = 1; break;
+        case WEST:  *dx = -1; break;
     }
 }
 
+/**
+ * @brief Applique le déplacement au joueur et met à jour sa tuile.
+ *
+ * @param server Le serveur.
+ * @param player Le joueur.
+ * @param dx Déplacement horizontal.
+ * @param dy Déplacement vertical.
+ */
 static void update_player_position(server_t *server, player_t *player,
     int dx, int dy)
 {
@@ -77,6 +107,12 @@ static void update_player_position(server_t *server, player_t *player,
         old_x, old_y, player->x, player->y, player->orientation);
 }
 
+/**
+ * @brief Fonction utilitaire pour déplacer un joueur vers l'avant.
+ *
+ * @param server Le serveur.
+ * @param player Le joueur concerné.
+ */
 void move_player_forward(server_t *server, player_t *player)
 {
     int dx = 0;
@@ -86,6 +122,13 @@ void move_player_forward(server_t *server, player_t *player)
     update_player_position(server, player, dx, dy);
 }
 
+/**
+ * @brief Commande `Forward` : déplace le joueur vers l'avant.
+ *
+ * @param server Le serveur.
+ * @param client Le client ayant envoyé la commande.
+ * @param args Arguments passés (ignorés).
+ */
 void cmd_forward(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;
@@ -102,6 +145,13 @@ void cmd_forward(server_t *server, client_t *client, char **args)
     gui_broadcast_player_position(server, player);
 }
 
+/**
+ * @brief Commande `Right` : tourne le joueur à droite.
+ *
+ * @param server Le serveur.
+ * @param client Le client ayant envoyé la commande.
+ * @param args Arguments (ignorés).
+ */
 void cmd_right(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;
@@ -118,6 +168,13 @@ void cmd_right(server_t *server, client_t *client, char **args)
     gui_broadcast_player_position(server, player);
 }
 
+/**
+ * @brief Commande `Left` : tourne le joueur à gauche.
+ *
+ * @param server Le serveur.
+ * @param client Le client ayant envoyé la commande.
+ * @param args Arguments (ignorés).
+ */
 void cmd_left(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;

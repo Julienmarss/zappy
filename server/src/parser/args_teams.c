@@ -5,9 +5,20 @@
 ** args_teams
 */
 
+/**
+ * @file args_teams.c
+ * @brief Gère le parsing des arguments liés aux équipes et autres options du serveur.
+ */
+
 #include "parser.h"
 #include <getopt.h>
 
+/**
+ * @brief Alloue un tableau de chaînes pour stocker les noms des équipes.
+ *
+ * @param count Nombre d'équipes.
+ * @return Un tableau alloué dynamiquement de chaînes terminées par NULL.
+ */
 static char **allocate_teams(int count)
 {
     char **teams = malloc(sizeof(char *) * (count + 1));
@@ -20,6 +31,14 @@ static char **allocate_teams(int count)
     return teams;
 }
 
+/**
+ * @brief Compte le nombre d'arguments correspondant aux noms d'équipe.
+ *
+ * @param idx Pointeur vers l'index courant dans argv.
+ * @param argc Nombre total d'arguments.
+ * @param argv Tableau d'arguments.
+ * @return Le nombre de noms d'équipe détectés.
+ */
 static int count_team_args(int *idx, int argc, char **argv)
 {
     int count = 0;
@@ -31,6 +50,15 @@ static int count_team_args(int *idx, int argc, char **argv)
     return count;
 }
 
+/**
+ * @brief Copie les noms des équipes depuis argv vers un tableau de chaînes.
+ *
+ * @param teams Tableau à remplir.
+ * @param start Index de départ dans argv.
+ * @param count Nombre de noms à copier.
+ * @param argv Tableau des arguments.
+ * @return 0 si succès, -1 si échec.
+ */
 static int copy_team_names(char **teams, int start, int count, char **argv)
 {
     int i = 0;
@@ -45,6 +73,15 @@ static int copy_team_names(char **teams, int start, int count, char **argv)
     return 0;
 }
 
+/**
+ * @brief Parse les arguments d’équipes à partir de argv.
+ *
+ * @param teams Pointeur vers le tableau à remplir.
+ * @param idx Index courant dans argv.
+ * @param argc Nombre total d’arguments.
+ * @param argv Tableau d’arguments.
+ * @return Nombre d’équipes si succès, -1 si erreur.
+ */
 static int parse_teams(char ***teams, int *idx, int argc, char **argv)
 {
     int start = *idx;
@@ -61,6 +98,13 @@ static int parse_teams(char ***teams, int *idx, int argc, char **argv)
     return count;
 }
 
+/**
+ * @brief Gère les options numériques du programme.
+ *
+ * @param opt L’option détectée.
+ * @param optarg L’argument associé à cette option.
+ * @param args Structure à remplir.
+ */
 static void handle_numeric_options(int opt, char *optarg, args_t *args)
 {
     switch (opt) {
@@ -82,6 +126,14 @@ static void handle_numeric_options(int opt, char *optarg, args_t *args)
     }
 }
 
+/**
+ * @brief Gère les options classiques du serveur (hors -n).
+ *
+ * @param opt L’option détectée.
+ * @param optarg L’argument associé.
+ * @param args Structure d’arguments.
+ * @return 0 si succès, 84 si erreur, 'h' si demande d’aide.
+ */
 static int handle_option(int opt, char *optarg, args_t *args)
 {
     if (opt == 'h')
@@ -93,6 +145,13 @@ static int handle_option(int opt, char *optarg, args_t *args)
     return 84;
 }
 
+/**
+ * @brief Gère l’option `-n` (équipes).
+ *
+ * @param args Structure d’arguments.
+ * @param ctx Contexte de parsing.
+ * @return 0 si succès, 84 si erreur.
+ */
 static int handle_team_option(args_t *args, parse_ctx_t *ctx)
 {
     (*(ctx->optind))--;
@@ -101,6 +160,13 @@ static int handle_team_option(args_t *args, parse_ctx_t *ctx)
     return 0;
 }
 
+/**
+ * @brief Traite une seule option de la ligne de commande.
+ *
+ * @param args Structure de configuration à remplir.
+ * @param ctx Contexte de parsing.
+ * @return 0 si succès, 84 ou 'h' sinon.
+ */
 int process_single_option(args_t *args, parse_ctx_t *ctx)
 {
     int ret = 0;

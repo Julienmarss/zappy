@@ -5,8 +5,18 @@
 ** game
 */
 
+/**
+ * @file game.c
+ * @brief Contient les fonctions de gestion mémoire et d'accès à la carte et aux équipes du jeu.
+ */
+
 #include "server.h"
 
+/**
+ * @brief Libère tous les œufs d'une équipe.
+ *
+ * @param team L'équipe dont les œufs doivent être libérés.
+ */
 static void free_team_eggs(team_t *team)
 {
     egg_t *egg = team->eggs;
@@ -19,6 +29,11 @@ static void free_team_eggs(team_t *team)
     }
 }
 
+/**
+ * @brief Libère toutes les équipes du jeu, ainsi que leurs œufs.
+ *
+ * @param game Le jeu contenant les équipes.
+ */
 static void free_teams(game_t *game)
 {
     team_t *team = game->teams;
@@ -33,6 +48,12 @@ static void free_teams(game_t *game)
     }
 }
 
+/**
+ * @brief Libère une ligne de la carte (row de `tile_t`).
+ *
+ * @param row Tableau de tuiles à libérer.
+ * @param width Largeur de la ligne (nombre de colonnes).
+ */
 static void free_map_row(tile_t *row, int width)
 {
     for (int x = 0; x < width; x++)
@@ -40,6 +61,11 @@ static void free_map_row(tile_t *row, int width)
     free(row);
 }
 
+/**
+ * @brief Libère toute la carte du jeu.
+ *
+ * @param game Le jeu contenant la carte.
+ */
 void free_map(game_t *game)
 {
     if (!game->map)
@@ -51,6 +77,11 @@ void free_map(game_t *game)
     free(game->map);
 }
 
+/**
+ * @brief Détruit entièrement la structure `game_t` (carte, équipes...).
+ *
+ * @param game Le jeu à détruire.
+ */
 void game_destroy(game_t *game)
 {
     if (!game)
@@ -60,6 +91,14 @@ void game_destroy(game_t *game)
     free(game);
 }
 
+/**
+ * @brief Retourne un pointeur vers une tuile valide de la carte, avec gestion du débordement circulaire.
+ *
+ * @param game Le jeu contenant la carte.
+ * @param x Coordonnée x demandée.
+ * @param y Coordonnée y demandée.
+ * @return Pointeur vers la tuile, ou NULL si erreur.
+ */
 tile_t *game_get_tile(game_t *game, int x, int y)
 {
     if (!game || !game->map)

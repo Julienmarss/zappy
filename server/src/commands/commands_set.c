@@ -5,9 +5,23 @@
 ** commands_set
 */
 
+/**
+ * @file commands_set.c
+ * @brief Implémente la commande `Set` permettant à un joueur de poser une ressource au sol.
+ */
+
 #include "server.h"
 #include "gui_protocol.h"
 
+/**
+ * @brief Valide la requête `Set`.
+ *
+ * Vérifie que le joueur existe et que la ressource spécifiée est valide.
+ *
+ * @param client Le client ayant envoyé la commande.
+ * @param args Les arguments de la commande.
+ * @return true si la requête est valide, false sinon.
+ */
 static bool validate_set_request(client_t *client, char **args)
 {
     if (!client->player) {
@@ -23,6 +37,13 @@ static bool validate_set_request(client_t *client, char **args)
     return true;
 }
 
+/**
+ * @brief Vérifie si le joueur possède la ressource à poser.
+ *
+ * @param player Le joueur concerné.
+ * @param resource_name Le nom de la ressource.
+ * @return true si le joueur en possède au moins une unité, false sinon.
+ */
 static bool check_inventory_availability(player_t *player,
     const char *resource_name)
 {
@@ -36,6 +57,15 @@ static bool check_inventory_availability(player_t *player,
     return true;
 }
 
+/**
+ * @brief Exécute la logique du `Set`.
+ *
+ * Retire la ressource de l'inventaire et l'ajoute à la tuile du joueur.
+ *
+ * @param server Le serveur.
+ * @param player Le joueur.
+ * @param resource_name Nom de la ressource à poser.
+ */
 static void execute_set_action(server_t *server, player_t *player,
     const char *resource_name)
 {
@@ -49,6 +79,12 @@ static void execute_set_action(server_t *server, player_t *player,
         player->inventory[resource_index]);
 }
 
+/**
+ * @brief Notifie les clients graphiques d’un changement sur une tuile.
+ *
+ * @param server Le serveur.
+ * @param player Le joueur ayant modifié la tuile.
+ */
 static void broadcast_tile_content_change(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
@@ -69,6 +105,13 @@ static void broadcast_tile_content_change(server_t *server, player_t *player)
     gui_send_to_all_graphic_clients(server, message);
 }
 
+/**
+ * @brief Commande `Set` : permet à un joueur de déposer une ressource sur la tuile actuelle.
+ *
+ * @param server Le serveur.
+ * @param client Le client ayant émis la commande.
+ * @param args Arguments de la commande, où args[1] est le nom de la ressource.
+ */
 void cmd_set(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;

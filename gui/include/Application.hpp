@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** Application
+*/
+
 #pragma once
 #include "Common.hpp"
 #include "NetworkClient.hpp"
@@ -5,6 +12,12 @@
 #include "GameState.hpp"
 #include "Camera.hpp"
 #include "Renderer.hpp"
+#include <functional>
+
+extern bool g_levelUpTriggered;
+extern bool g_victoryTriggered;
+extern bool g_showVictoryPopup;
+extern std::string g_winnerTeamName;
 
 namespace Zappy {
 
@@ -17,7 +30,6 @@ namespace Zappy {
         TRANSITION
     };
 
-    // Pages suivantes (pour les transitions!!)
     enum class AppStateTarget {
         MENU,
         GAME,
@@ -56,7 +68,6 @@ namespace Zappy {
         bool fullscreen = false;
         int selected = 0;
 
-        // Transition blanche floutée
         AppStateTarget transitionTarget = AppStateTarget::NONE;
         bool transitioning = false;
         float transitionAlpha = 0.0f;
@@ -100,7 +111,6 @@ namespace Zappy {
         void renderLegend();
         Color getResourceColorForLegend(ResourceType type) const;
 
-        // Méthodes transitions
         void startTransition(AppStateTarget target);
         void renderTransition();
         void updateTransition();
@@ -113,6 +123,47 @@ namespace Zappy {
         void renderTeamsHUD();
         void renderConnectionHUD();
         void renderSelectedPlayerHUD();
+        float getScreenScale() const;
+        void updateFullscreenScale();
+        bool showFullMapInfo{false};
+        void renderFullMapInfoPanel();
+        enum class AudioEvent {
+    LEVEL_UP,
+    VICTORY,
+    NONE
+};
+
+    AudioEvent pendingAudioEvent{AudioEvent::NONE};
+    Sound levelUpSound{};
+    Sound victorySound{};
+    bool soundsLoaded{false};
+    void loadSounds();
+    void processAudioEvents();
+
+    struct Button {
+        Rectangle rect;
+        std::string text;
+        Color color;
+        Color hoverColor;
+        bool isHovered;
+        std::function<void()> onClick;
+    
+        Button(Rectangle r, std::string t, Color c, Color h, std::function<void()> callback)
+            : rect(r), text(t), color(c), hoverColor(h), isHovered(false), onClick(callback) {}
+    };
+
+    std::vector<Button> menuButtons;
+    std::vector<Button> gameButtons;
+    void initializeButtons();
+    void updateButtons(std::vector<Button>& buttons);
+    void renderButtons(const std::vector<Button>& buttons);
+
+    std::vector<Button> helpButtons;
+    std::vector<Button> creditsButtons;
+    std::vector<Button> settingsButtons;
+    bool showVictoryPopup{false};
+    std::string winnerTeamName;
+    void renderVictoryPopup();
 
     public:
         Application() = default;
@@ -123,6 +174,9 @@ namespace Zappy {
 
         void loadMusic();
         void updateMusic();
+
+        void triggerLevelUpSound() { pendingAudioEvent = AudioEvent::LEVEL_UP; }
+void triggerVictorySound() { pendingAudioEvent = AudioEvent::VICTORY; }
 
         bool initialize(int argc, char* argv[]);
         void run();

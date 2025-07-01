@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** Game state header
+*/
+
 #pragma once
 #include "Common.hpp"
 

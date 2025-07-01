@@ -5,9 +5,21 @@
 ** incantation_execution
 */
 
+/**
+ * @file incantation_execution.c
+ * @brief Contient les fonctions de gestion de l'exécution d'une incantation dans Zappy.
+ */
+
 #include "incantation.h"
 #include "gui_protocol.h"
 
+/**
+ * @brief Envoie une mise à jour de l'état de la case (ressources) après une incantation.
+ *
+ * @param server Le serveur contenant les informations du jeu.
+ * @param x La coordonnée X de la case.
+ * @param y La coordonnée Y de la case.
+ */
 static void broadcast_tile_content_after_incantation(server_t *server,
     int x, int y)
 {
@@ -29,6 +41,12 @@ static void broadcast_tile_content_after_incantation(server_t *server,
     gui_send_to_all_graphic_clients(server, message);
 }
 
+/**
+ * @brief Consomme les ressources nécessaires à l'incantation sur la case du joueur.
+ *
+ * @param server Le serveur de jeu.
+ * @param player Le joueur qui initie l'incantation.
+ */
 static void consume_elevation_resources(server_t *server, player_t *player)
 {
     tile_t *tile = game_get_tile(server->game, player->x, player->y);
@@ -46,6 +64,11 @@ static void consume_elevation_resources(server_t *server, player_t *player)
     broadcast_tile_content_after_incantation(server, player->x, player->y);
 }
 
+/**
+ * @brief Augmente le niveau d’un seul joueur.
+ *
+ * @param player Le joueur à faire monter de niveau.
+ */
 static void elevate_single_player(player_t *player)
 {
     char message[64];
@@ -58,6 +81,11 @@ static void elevate_single_player(player_t *player)
     }
 }
 
+/**
+ * @brief Monte de niveau tous les joueurs participants à l'incantation.
+ *
+ * @param ctx Le contexte de l'incantation contenant les participants.
+ */
 static void elevate_participants(incantation_ctx_t *ctx)
 {
     for (int i = 0; i < ctx->nb_participants; i++) {
@@ -67,6 +95,12 @@ static void elevate_participants(incantation_ctx_t *ctx)
     }
 }
 
+/**
+ * @brief Diffuse aux clients graphiques les mises à jour des joueurs (niveau et inventaire).
+ *
+ * @param server Le serveur de jeu.
+ * @param ctx Le contexte de l'incantation.
+ */
 static void broadcast_player_updates(server_t *server, incantation_ctx_t *ctx)
 {
     for (int i = 0; i < ctx->nb_participants; i++) {
@@ -77,6 +111,15 @@ static void broadcast_player_updates(server_t *server, incantation_ctx_t *ctx)
     }
 }
 
+/**
+ * @brief Fonction principale exécutant l’incantation : 
+ * diffusion des messages graphiques, consommation des ressources,
+ * élévation des joueurs et vérification de fin de partie.
+ *
+ * @param server Le serveur de jeu.
+ * @param player Le joueur initiateur de l'incantation.
+ * @param ctx Le contexte de l'incantation.
+ */
 void execute_incantation_ritual(server_t *server, player_t *player,
     incantation_ctx_t *ctx)
 {

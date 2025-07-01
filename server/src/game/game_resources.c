@@ -5,19 +5,34 @@
 ** game_resources
 */
 
+/**
+ * @file game_resources.c
+ * @brief Gestion dynamique des ressources sur la carte du jeu.
+ */
+
 #include "server.h"
 #include "gui_protocol.h"
 
+/**
+ * @brief Densité cible de chaque ressource par case.
+ */
 static const float RESOURCE_DENSITY[] = {
-    0.5,
-    0.3,
-    0.15,
-    0.1,
-    0.1,
-    0.08,
-    0.05
+    0.5,  // FOOD
+    0.3,  // LINEMATE
+    0.15, // DERAUMERE
+    0.1,  // SIBUR
+    0.1,  // MENDIANE
+    0.08, // PHIRAS
+    0.05  // THYSTAME
 };
 
+/**
+ * @brief Compte le nombre d'unités d’un type de ressource sur une tuile.
+ *
+ * @param tile La tuile à analyser.
+ * @param resource_type Type de ressource.
+ * @return Quantité trouvée.
+ */
 static int count_resources_in_tile(tile_t *tile, int resource_type)
 {
     if (tile)
@@ -25,6 +40,13 @@ static int count_resources_in_tile(tile_t *tile, int resource_type)
     return 0;
 }
 
+/**
+ * @brief Compte la quantité totale d’un type de ressource sur toute la carte.
+ *
+ * @param game Instance du jeu.
+ * @param resource_type Type de ressource.
+ * @return Quantité totale trouvée.
+ */
 static int count_total_resources_on_map(game_t *game, int resource_type)
 {
     int total = 0;
@@ -39,6 +61,13 @@ static int count_total_resources_on_map(game_t *game, int resource_type)
     return total;
 }
 
+/**
+ * @brief Calcule la quantité cible à maintenir pour un type de ressource.
+ *
+ * @param game Instance du jeu.
+ * @param resource_type Type de ressource.
+ * @return Quantité cible.
+ */
 static int calculate_target_quantity(game_t *game, int resource_type)
 {
     int total_tiles = game->width * game->height;
@@ -49,6 +78,14 @@ static int calculate_target_quantity(game_t *game, int resource_type)
     return target_quantity;
 }
 
+/**
+ * @brief Envoie une mise à jour de tuile aux clients graphiques.
+ *
+ * @param server Le serveur.
+ * @param x Coordonnée X de la tuile.
+ * @param y Coordonnée Y de la tuile.
+ * @param tile Pointeur vers la tuile.
+ */
 static void send_tile_update(server_t *server, int x, int y, tile_t *tile)
 {
     char message[MAX_GUI_RESPONSE];
@@ -62,6 +99,12 @@ static void send_tile_update(server_t *server, int x, int y, tile_t *tile)
     gui_send_to_all_graphic_clients(server, message);
 }
 
+/**
+ * @brief Fait apparaître une ressource d’un type donné à une position aléatoire.
+ *
+ * @param server Le serveur.
+ * @param resource_type Le type de ressource à générer.
+ */
 static void spawn_single_resource(server_t *server, int resource_type)
 {
     int x = rand() % server->game->width;
@@ -74,6 +117,13 @@ static void spawn_single_resource(server_t *server, int resource_type)
     }
 }
 
+/**
+ * @brief Fait apparaître plusieurs unités d’un type de ressource.
+ *
+ * @param server Le serveur.
+ * @param resource_type Type de ressource.
+ * @param quantity Quantité à générer.
+ */
 static void spawn_resource_type(server_t *server, int resource_type,
     int quantity)
 {
@@ -89,6 +139,12 @@ static void spawn_resource_type(server_t *server, int resource_type,
     }
 }
 
+/**
+ * @brief Maintient la densité cible d’un type de ressource sur la carte.
+ *
+ * @param server Le serveur.
+ * @param resource_type Type de ressource à vérifier.
+ */
 static void maintain_resource_density(server_t *server, int resource_type)
 {
     int current_total = count_total_resources_on_map(server->game,
@@ -98,13 +154,21 @@ static void maintain_resource_density(server_t *server, int resource_type)
     int spawn_amount = 0;
 
     if (to_spawn > 0) {
-        spawn_amount = (to_spawn + 9) / 10;
+        spawn_amount = (to_spawn + 9) / 10; // Ajout progressif
         if (spawn_amount < 1)
             spawn_amount = 1;
         spawn_resource_type(server, resource_type, spawn_amount);
     }
 }
 
+/**
+ * @brief Fonction principale de réapparition périodique des ressources.
+ *
+ * Appelée régulièrement pour s’assurer que chaque type de ressource reste
+ * proche de sa densité cible sur la carte.
+ *
+ * @param server Le serveur de jeu.
+ */
 void game_spawn_resources(server_t *server)
 {
     if (!server || !server->game)

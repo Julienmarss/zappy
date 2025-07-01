@@ -5,8 +5,22 @@
 ** game_teams
 */
 
+/**
+ * @file game_teams.c
+ * @brief Gère la création et l'initialisation des équipes et de leurs œufs dans le jeu.
+ */
+
 #include "server.h"
 
+/**
+ * @brief Crée un nouvel œuf pour une équipe donnée.
+ *
+ * L'œuf est assigné à une position aléatoire sur la carte et reçoit un identifiant unique.
+ *
+ * @param game Instance du jeu.
+ * @param team Équipe pour laquelle l'œuf est créé.
+ * @return Pointeur vers l'œuf créé, ou NULL en cas d'échec.
+ */
 static egg_t *create_egg(game_t *game, team_t *team)
 {
     egg_t *egg = malloc(sizeof(egg_t));
@@ -24,6 +38,14 @@ static egg_t *create_egg(game_t *game, team_t *team)
     return egg;
 }
 
+/**
+ * @brief Ajoute un œuf à la tuile correspondante sur la carte.
+ *
+ * Parcourt la liste chaînée des œufs présents sur la tuile et ajoute l'œuf à la fin.
+ *
+ * @param game Instance du jeu.
+ * @param egg Œuf à ajouter.
+ */
 static void add_egg_to_tile(game_t *game, egg_t *egg)
 {
     tile_t *tile = game_get_tile(game, egg->x, egg->y);
@@ -41,6 +63,15 @@ static void add_egg_to_tile(game_t *game, egg_t *egg)
         egg->id, egg->x, egg->y);
 }
 
+/**
+ * @brief Crée une nouvelle équipe avec un nom et une capacité maximale de clients.
+ *
+ * Alloue et initialise la structure d'équipe, puis duplique le nom de l'équipe.
+ *
+ * @param name Nom de l'équipe.
+ * @param nb_clients Nombre maximum de clients dans l'équipe.
+ * @return Pointeur vers l'équipe créée, ou NULL en cas d'échec.
+ */
 static team_t *create_team(const char *name, int nb_clients)
 {
     team_t *team = malloc(sizeof(team_t));
@@ -61,6 +92,15 @@ static team_t *create_team(const char *name, int nb_clients)
     return team;
 }
 
+/**
+ * @brief Crée les œufs initiaux pour une équipe.
+ *
+ * Pour chaque client maximum dans l'équipe, un œuf est créé, ajouté à l'équipe et assigné à une tuile.
+ *
+ * @param game Instance du jeu.
+ * @param team L'équipe concernée.
+ * @param nb_clients Nombre d'œufs à créer (équivalent au nombre maximum de clients).
+ */
 static void create_team_eggs(game_t *game, team_t *team, int nb_clients)
 {
     egg_t *egg = NULL;
@@ -81,6 +121,15 @@ static void create_team_eggs(game_t *game, team_t *team, int nb_clients)
         team->name, (void *)team->eggs);
 }
 
+/**
+ * @brief Initialise les équipes du jeu.
+ *
+ * Pour chaque nom d'équipe fourni, crée une équipe, initialise ses œufs et les chaîne dans la liste des équipes du jeu.
+ *
+ * @param game Instance du jeu.
+ * @param team_names Tableau de chaînes contenant les noms des équipes (terminé par NULL).
+ * @param nb_clients Nombre maximum de clients par équipe.
+ */
 void init_teams(game_t *game, char **team_names, int nb_clients)
 {
     team_t *team = NULL;

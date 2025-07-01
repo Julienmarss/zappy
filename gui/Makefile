@@ -14,10 +14,8 @@ RM	=	rm -f
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++17
 CXXFLAGS	+=	-I./include
 
-# Debug flags
 DEBUG_FLAGS	=	-g3 -DDEBUG
 
-# Raylib flags
 RAYLIB_FLAGS	=	-lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 SRCS	=	src/main.cpp				\
@@ -26,11 +24,7 @@ SRCS	=	src/main.cpp				\
 		src/network/NetworkClient.cpp		\
 		src/network/ProtocolHandler.cpp		\
 		src/graphics/Camera.cpp			\
-		src/graphics/Renderer.cpp		\
-		src/graphics/UI.cpp			\
-		src/game/Map.cpp			\
-		src/game/Player.cpp			\
-		src/game/Team.cpp
+		src/graphics/Renderer.cpp
 
 OBJS	=	$(SRCS:.cpp=.o)
 
@@ -39,7 +33,7 @@ all:	$(NAME)
 $(NAME):	$(OBJS)
 	@echo "Linking $(NAME)..."
 	@$(CXX) -o $(NAME) $(OBJS) $(RAYLIB_FLAGS)
-	@echo "✅ C++ GUI compiled successfully!"
+	@echo "GUI compiled successfully!"
 
 %.o: %.cpp
 	@echo "Compiling $<..."
@@ -57,7 +51,7 @@ re:	fclean all
 
 debug:	CXXFLAGS += $(DEBUG_FLAGS)
 debug:	re
-	@echo "✅ Debug build completed!"
+	@echo "Debug build completed!"
 
 install-deps:
 	@echo "Installing Raylib dependencies..."

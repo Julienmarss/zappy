@@ -5,15 +5,32 @@
 ** main
 */
 
+/**
+ * @file main.c
+ * @brief Point d'entrée principal du serveur Zappy.
+ */
+
 #include "server.h"
 #include "parser.h"
 
+/**
+ * @brief Initialise et lance le serveur avec les arguments fournis.
+ * 
+ * @param args Structure contenant les arguments du programme.
+ * @return 0 en cas de succès, 84 en cas d'erreur.
+ */
 static int run_server_with_args(args_t *args)
 {
     server_t *server = NULL;
     int ret = 0;
-    server_config_t config = {args->port, args->width, args->height,
-        args->teams, args->clients_nb, args->freq};
+    server_config_t config = {
+        args->port,
+        args->width,
+        args->height,
+        args->teams,
+        args->clients_nb,
+        args->freq
+    };
 
     printf("DEBUG: Creating server...\n");
     server = server_create(&config);
@@ -27,6 +44,13 @@ static int run_server_with_args(args_t *args)
     return ret;
 }
 
+/**
+ * @brief Fonction principale. Gère le parsing des arguments et le lancement du serveur.
+ * 
+ * @param argc Nombre d'arguments en ligne de commande.
+ * @param argv Tableau de chaînes contenant les arguments.
+ * @return 0 si tout se passe bien, 84 en cas d'erreur.
+ */
 int main(int argc, char **argv)
 {
     args_t args = {0};

@@ -5,8 +5,16 @@
 ** network_commands
 */
 
+/**
+ * @file network_commands.c
+ * @brief Gère le traitement et l'exécution des commandes des joueurs.
+ */
+
 #include "server.h"
 
+/**
+ * @brief Table des commandes valides, associées à leur fonction et temps d'exécution.
+ */
 static const cmd_info_t COMMANDS[] = {
     {"Forward", cmd_forward, 7},
     {"Right", cmd_right, 7},
@@ -23,6 +31,12 @@ static const cmd_info_t COMMANDS[] = {
     {NULL, NULL, 0}
 };
 
+/**
+ * @brief Recherche une commande dans la table des commandes disponibles.
+ *
+ * @param name Nom de la commande.
+ * @return Pointeur vers la structure cmd_info_t correspondante si trouvée, NULL sinon.
+ */
 static const cmd_info_t *find_command(const char *name)
 {
     printf("DEBUG: Looking for command '%s'\n", name);
@@ -37,6 +51,13 @@ static const cmd_info_t *find_command(const char *name)
     return NULL;
 }
 
+/**
+ * @brief Exécute une commande d’un joueur si elle est valide.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client Pointeur vers le client joueur.
+ * @param args Arguments de la commande.
+ */
 static void execute_player_command(server_t *server, client_t *client,
     char **args)
 {
@@ -59,6 +80,15 @@ static void execute_player_command(server_t *server, client_t *client,
     }
 }
 
+/**
+ * @brief Traite la prochaine commande en attente dans la file d’un client joueur.
+ *
+ * Vérifie que le joueur n’est pas occupé, puis exécute la commande en tête
+ * de la file.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client Pointeur vers le client joueur.
+ */
 void network_process_commands(server_t *server, client_t *client)
 {
     command_t *cmd = NULL;

@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** Renderer
+*/
+
 #include "../../include/Renderer.hpp"
 #include "../../include/GameState.hpp"
 #include "../../include/Camera.hpp"
@@ -72,8 +79,6 @@ void Renderer::renderFrame(const GameState& gameState, const Camera& camera)
     renderPlayers(gameState);
     
     EndMode2D();
-    
-//  renderUI(gameState);
 }
 
 void Renderer::renderMap(const GameState& gameState, const Camera& camera)
@@ -84,12 +89,11 @@ void Renderer::renderMap(const GameState& gameState, const Camera& camera)
     }
     
     Vector2 topLeft = camera.screenToWorld({0, 0});
-    Vector2 bottomRight = camera.screenToWorld({WINDOW_WIDTH, WINDOW_HEIGHT});
-    
-    int startX = std::max(0, static_cast<int>(topLeft.x / TILE_SIZE) - 1);
-    int endX = std::min(mapSize.x, static_cast<int>(bottomRight.x / TILE_SIZE) + 2);
-    int startY = std::max(0, static_cast<int>(topLeft.y / TILE_SIZE) - 1);
-    int endY = std::min(mapSize.y, static_cast<int>(bottomRight.y / TILE_SIZE) + 2);
+Vector2 bottomRight = camera.screenToWorld({(float)GetScreenWidth(), (float)GetScreenHeight()});    
+int startX = std::max(0, static_cast<int>(topLeft.x / BASE_TILE_SIZE) - 1);
+int endX = std::min(mapSize.x, static_cast<int>(bottomRight.x / BASE_TILE_SIZE) + 2);
+int startY = std::max(0, static_cast<int>(topLeft.y / BASE_TILE_SIZE) - 1);
+int endY = std::min(mapSize.y, static_cast<int>(bottomRight.y / BASE_TILE_SIZE) + 2);
     
     for (int y = startY; y < endY; ++y) {
         for (int x = startX; x < endX; ++x) {
@@ -103,8 +107,8 @@ void Renderer::renderMap(const GameState& gameState, const Camera& camera)
 
 void Renderer::renderTile(const TileData& tile, int x, int y)
 {
-    float tileX = x * TILE_SIZE;
-    float tileY = y * TILE_SIZE;
+float tileX = x * BASE_TILE_SIZE;
+float tileY = y * BASE_TILE_SIZE;
     
     Color baseColor = {25, 25, 35, 255};
     Color topColor = baseColor;
@@ -127,27 +131,27 @@ void Renderer::renderTile(const TileData& tile, int x, int y)
     }
     
     DrawRectangleGradientV(static_cast<int>(tileX), static_cast<int>(tileY), 
-                           TILE_SIZE, TILE_SIZE, topColor, bottomColor);
+                           BASE_TILE_SIZE, BASE_TILE_SIZE, topColor, bottomColor);
     
     Color borderColor = {80, 80, 90, 255};
     
     DrawRectangleLines(static_cast<int>(tileX), static_cast<int>(tileY), 
-                       TILE_SIZE, TILE_SIZE, borderColor);
+                       BASE_TILE_SIZE, BASE_TILE_SIZE, borderColor);
     
     DrawRectangleLines(static_cast<int>(tileX + 1), static_cast<int>(tileY + 1), 
-                       TILE_SIZE - 2, TILE_SIZE - 2, Fade(borderColor, 0.5f));
+                       BASE_TILE_SIZE - 2, BASE_TILE_SIZE - 2, Fade(borderColor, 0.5f));
     
     Color shadowColor = {0, 0, 0, 30};
-    DrawRectangle(static_cast<int>(tileX + TILE_SIZE - 2), static_cast<int>(tileY + 2), 
-                  2, TILE_SIZE - 2, shadowColor);
-    DrawRectangle(static_cast<int>(tileX + 2), static_cast<int>(tileY + TILE_SIZE - 2), 
-                  TILE_SIZE - 2, 2, shadowColor);
+    DrawRectangle(static_cast<int>(tileX + BASE_TILE_SIZE - 2), static_cast<int>(tileY + 2), 
+                  2, BASE_TILE_SIZE - 2, shadowColor);
+    DrawRectangle(static_cast<int>(tileX + 2), static_cast<int>(tileY + BASE_TILE_SIZE - 2), 
+                  BASE_TILE_SIZE - 2, 2, shadowColor);
     
     renderTileResources(tile, tileX, tileY);
     
     for (size_t i = 0; i < tile.eggs.size(); ++i) {
-        float eggX = tileX + TILE_SIZE/2;
-        float eggY = tileY + TILE_SIZE/2;
+        float eggX = tileX + BASE_TILE_SIZE/2;
+        float eggY = tileY + BASE_TILE_SIZE/2;
         
         DrawCircle(static_cast<int>(eggX), static_cast<int>(eggY), 8, Fade(YELLOW, 0.3f));
         DrawCircle(static_cast<int>(eggX), static_cast<int>(eggY), 6, WHITE);
@@ -162,8 +166,8 @@ void Renderer::renderTileResources(const TileData& tile, float tileX, float tile
     
     for (int i = 0; i < static_cast<int>(ResourceType::COUNT) && resourceCount < maxResourcesShown; ++i) {
         for (int j = 0; j < tile.resources[i] && resourceCount < maxResourcesShown; ++j) {
-            float offsetX = (resourceCount % 3) * (TILE_SIZE / 3) + TILE_SIZE / 6;
-            float offsetY = (resourceCount / 3) * (TILE_SIZE / 3) + TILE_SIZE / 6;
+            float offsetX = (resourceCount % 3) * (BASE_TILE_SIZE / 3) + BASE_TILE_SIZE / 6;
+            float offsetY = (resourceCount / 3) * (BASE_TILE_SIZE / 3) + BASE_TILE_SIZE / 6;
             
             Color color = getResourceColor(static_cast<ResourceType>(i));
             
@@ -206,10 +210,10 @@ void Renderer::renderTileResources(const TileData& tile, float tileX, float tile
     }
     
     if (totalResources > maxResourcesShown) {
-        DrawCircle(static_cast<int>(tileX + TILE_SIZE - 8), 
-                  static_cast<int>(tileY + TILE_SIZE - 8), 6, Fade(WHITE, 0.8f));
-        DrawText("+", static_cast<int>(tileX + TILE_SIZE - 10), 
-                static_cast<int>(tileY + TILE_SIZE - 12), 10, BLACK);
+        DrawCircle(static_cast<int>(tileX + BASE_TILE_SIZE - 8), 
+                  static_cast<int>(tileY + BASE_TILE_SIZE - 8), 6, Fade(WHITE, 0.8f));
+        DrawText("+", static_cast<int>(tileX + BASE_TILE_SIZE - 10), 
+                static_cast<int>(tileY + BASE_TILE_SIZE - 12), 10, BLACK);
     }
 }
 
@@ -221,12 +225,13 @@ void Renderer::renderPlayers(const GameState& gameState)
         const PlayerData& player = pair.second;
         if (!player.alive) continue;
         
-        float x = player.pos.x * TILE_SIZE + TILE_SIZE / 2;
-        float y = player.pos.y * TILE_SIZE + TILE_SIZE / 2;
+        float x = player.pos.x * BASE_TILE_SIZE + BASE_TILE_SIZE / 2;
+        float y = player.pos.y * BASE_TILE_SIZE + BASE_TILE_SIZE / 2;
         
-        Color teamColor = getTeamColor(player.teamName);
-        
-        float radius = TILE_SIZE / 4 + (player.level - 1) * 1.5f;
+        const TeamData* team = gameState.getTeam(player.teamName);
+        Color teamColor = team ? team->color : WHITE;
+
+        float radius = BASE_TILE_SIZE / 4 + (player.level - 1) * 1.5f;
         
         DrawCircle(static_cast<int>(x), static_cast<int>(y), radius, teamColor);
         DrawCircleLines(static_cast<int>(x), static_cast<int>(y), radius, BLACK);
@@ -313,20 +318,42 @@ void Renderer::renderUI(const GameState& gameState)
     
     std::string connectionStatus = "Status: Connected";
     DrawTextEx(font, connectionStatus.c_str(), 
-               {WINDOW_WIDTH - 200, 10}, 14, 1, GREEN);
-    
+        {(float)(GetScreenWidth() - 200), 10.0f}, 14, 1, GREEN);    
     if (gameState.isGameEnded()) {
-        DrawRectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, {0, 0, 0, 128});
-        
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {0, 0, 0, 128});        
         std::string winnerText = "Game Ended!\nWinner: " + gameState.getWinnerTeam();
         
         Vector2 textSize = MeasureTextEx(font, winnerText.c_str(), 48, 2);
         Vector2 position = {
-            (WINDOW_WIDTH - textSize.x) / 2,
-            (WINDOW_HEIGHT - textSize.y) / 2
+            (GetScreenWidth() - textSize.x) / 2,
+            (GetScreenHeight() - textSize.y) / 2
         };
         
         DrawTextEx(font, winnerText.c_str(), position, 48, 2, GOLD);
+    }
+}
+
+void Renderer::handleMouseClick(const Vector2& mousePos, const Camera& camera, const GameState& gameState)
+{
+    Vector2 worldPos = camera.screenToWorld(mousePos);
+    int tileX = static_cast<int>(worldPos.x / BASE_TILE_SIZE);
+    int tileY = static_cast<int>(worldPos.y / BASE_TILE_SIZE);
+    
+    Position mapSize = gameState.getMapSize();
+    if (tileX < 0 || tileX >= mapSize.x || tileY < 0 || tileY >= mapSize.y) {
+        selectedObject.type = SelectedObject::NONE;
+        return;
+    }
+    
+    const TileData* tile = gameState.getTile(tileX, tileY);
+    if (tile && !tile->players.empty()) {
+        selectedObject.type = SelectedObject::PLAYER;
+        selectedObject.position = Position(tileX, tileY);
+        selectedObject.playerId = tile->players[0];
+    } else {
+        selectedObject.type = SelectedObject::TILE;
+        selectedObject.position = Position(tileX, tileY);
+        selectedObject.playerId = -1;
     }
 }
 

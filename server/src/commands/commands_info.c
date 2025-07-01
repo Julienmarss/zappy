@@ -5,8 +5,14 @@
 ** commands_info
 */
 
+/**
+ * @file commands_info.c
+ * @brief Implémente les commandes `Inventory` et `Connect_nbr` pour les clients joueurs.
+ */
+
 #include "server.h"
 
+/// Noms lisibles des différentes ressources.
 static const char *RESOURCE_NAMES[] = {
     "food",
     "linemate",
@@ -17,6 +23,15 @@ static const char *RESOURCE_NAMES[] = {
     "thystame"
 };
 
+/**
+ * @brief Commande `Inventory` : envoie l'inventaire du joueur au format Zappy.
+ *
+ * Format retourné : `[resource count, ...]\n`
+ *
+ * @param server Le serveur (non utilisé ici).
+ * @param client Le client ayant envoyé la commande.
+ * @param args Les arguments de la commande (non utilisés).
+ */
 void cmd_inventory(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;
@@ -41,6 +56,15 @@ void cmd_inventory(server_t *server, client_t *client, char **args)
     network_send(client, buffer);
 }
 
+/**
+ * @brief Commande `Connect_nbr` : renvoie le nombre de connexions disponibles dans l'équipe du joueur.
+ *
+ * Format retourné : `<nb_slots_libres>\n`
+ *
+ * @param server Le serveur (non utilisé ici).
+ * @param client Le client ayant envoyé la commande.
+ * @param args Les arguments de la commande (non utilisés).
+ */
 void cmd_connect_nbr(server_t *server, client_t *client, char **args)
 {
     player_t *player = client->player;

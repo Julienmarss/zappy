@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** Camera header
+*/
+
 #pragma once
 #include "Common.hpp"
 
@@ -24,5 +31,6 @@ namespace Zappy {
         const Camera2D& getRaylibCamera() const { return raylibCamera; }
         float getZoom() const { return zoomLevel; }
         Position getTarget() const { return targetPosition; }
+
     };
 }

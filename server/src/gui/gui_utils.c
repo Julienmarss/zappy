@@ -5,8 +5,19 @@
 ** gui_utils
 */
 
+/**
+ * @file gui_utils.c
+ * @brief Fonctions utilitaires pour le protocole graphique (GUI) dans Zappy.
+ */
+
 #include "gui_protocol.h"
 
+/**
+ * @brief Envoie un message à tous les clients graphiques connectés.
+ *
+ * @param server Pointeur vers la structure du serveur.
+ * @param message Message à envoyer (terminé par \n).
+ */
 void gui_send_to_all_graphic_clients(server_t *server, const char *message)
 {
     client_t *client = server->clients;
@@ -29,6 +40,12 @@ void gui_send_to_all_graphic_clients(server_t *server, const char *message)
     }
 }
 
+/**
+ * @brief Formate un identifiant de joueur pour les messages GUI.
+ *
+ * @param player_id L'identifiant du joueur.
+ * @return Une chaîne statique du type "#<id>".
+ */
 char *gui_format_player_id(int player_id)
 {
     static char buffer[16];
@@ -37,6 +54,12 @@ char *gui_format_player_id(int player_id)
     return buffer;
 }
 
+/**
+ * @brief Formate un identifiant d'œuf pour les messages GUI.
+ *
+ * @param egg_id L'identifiant de l'œuf.
+ * @return Une chaîne statique du type "#<id>".
+ */
 char *gui_format_egg_id(int egg_id)
 {
     static char buffer[16];
@@ -45,6 +68,14 @@ char *gui_format_egg_id(int egg_id)
     return buffer;
 }
 
+/**
+ * @brief Vérifie si des coordonnées sont valides sur la carte.
+ *
+ * @param server Le serveur contenant les dimensions de la carte.
+ * @param x Coordonnée x.
+ * @param y Coordonnée y.
+ * @return true si les coordonnées sont valides, false sinon.
+ */
 bool gui_is_valid_coordinates(server_t *server, int x, int y)
 {
     if (!server || !server->game)
@@ -56,6 +87,13 @@ bool gui_is_valid_coordinates(server_t *server, int x, int y)
     return true;
 }
 
+/**
+ * @brief Recherche un joueur par son ID dans la liste des clients.
+ *
+ * @param server Le serveur contenant les clients.
+ * @param player_id L'identifiant du joueur recherché.
+ * @return Un pointeur vers le joueur s’il est trouvé, NULL sinon.
+ */
 static player_t *find_player_in_clients(server_t *server, int player_id)
 {
     client_t *client = server->clients;
@@ -70,6 +108,13 @@ static player_t *find_player_in_clients(server_t *server, int player_id)
     return NULL;
 }
 
+/**
+ * @brief Vérifie si un identifiant de joueur est valide.
+ *
+ * @param server Le serveur contenant les clients.
+ * @param player_id Identifiant à vérifier.
+ * @return true si un joueur avec cet ID existe, false sinon.
+ */
 bool gui_is_valid_player_id(server_t *server, int player_id)
 {
     if (!server || player_id <= 0)

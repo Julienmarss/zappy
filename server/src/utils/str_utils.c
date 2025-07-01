@@ -5,8 +5,20 @@
 ** str_utils
 */
 
+/**
+ * @file str_utils.c
+ * @brief Fournit des fonctions utilitaires pour manipuler les chaînes de caractères.
+ */
+
 #include "server.h"
 
+/**
+ * @brief Compte le nombre de mots dans une chaîne, séparés par un délimiteur.
+ * 
+ * @param str Chaîne à analyser.
+ * @param delim Caractère délimiteur.
+ * @return Nombre de mots détectés.
+ */
 static int count_words(const char *str, char delim)
 {
     int count = 0;
@@ -23,6 +35,14 @@ static int count_words(const char *str, char delim)
     return count;
 }
 
+/**
+ * @brief Extrait un mot de la chaîne à partir d’un index, jusqu’au délimiteur.
+ * 
+ * @param str Chaîne source.
+ * @param idx Index de départ (sera modifié).
+ * @param delim Délimiteur.
+ * @return Mot extrait (chaîne allouée dynamiquement).
+ */
 static char *extract_word(const char *str, int *idx, char delim)
 {
     int start = *idx;
@@ -43,19 +63,37 @@ static char *extract_word(const char *str, int *idx, char delim)
     return word;
 }
 
+/**
+ * @brief Alloue un tableau de chaînes pour le résultat du split.
+ * 
+ * @param words Nombre de mots à contenir.
+ * @return Tableau alloué (terminé par NULL).
+ */
 static char **allocate_result(int words)
 {
-    char **result = calloc(words + 1, sizeof(char *));
-
-    return result;
+    return calloc(words + 1, sizeof(char *));
 }
 
+/**
+ * @brief Ignore un caractère délimiteur dans la chaîne.
+ * 
+ * @param str Chaîne source.
+ * @param idx Index courant (sera modifié).
+ * @param delim Caractère délimiteur.
+ */
 static void skip_delimiter(const char *str, int *idx, char delim)
 {
     if (str[*idx] == delim)
         (*idx)++;
 }
 
+/**
+ * @brief Gère un caractère courant dans la logique du split.
+ * 
+ * @param str Chaîne source.
+ * @param ctx Contexte du split.
+ * @return 0 en cas de succès, -1 en cas d'erreur.
+ */
 static int process_character(const char *str, split_ctx_t *ctx)
 {
     if (str[*ctx->idx] != ctx->delim) {
@@ -71,6 +109,14 @@ static int process_character(const char *str, split_ctx_t *ctx)
     return 0;
 }
 
+/**
+ * @brief Découpe une chaîne en mots selon un délimiteur.
+ * 
+ * @param str Chaîne source.
+ * @param delim Caractère délimiteur.
+ * @param words Nombre de mots à extraire.
+ * @return Tableau de mots alloué dynamiquement.
+ */
 static char **split_words(const char *str, char delim, int words)
 {
     char **result = allocate_result(words);
@@ -88,11 +134,24 @@ static char **split_words(const char *str, char delim, int words)
     return result;
 }
 
+/**
+ * @brief Vérifie si un caractère est un espace blanc.
+ * 
+ * @param c Caractère à vérifier.
+ * @return true si c'est un espace blanc, false sinon.
+ */
 static bool is_whitespace(char c)
 {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
+/**
+ * @brief Découpe une chaîne en mots en fonction d’un délimiteur.
+ * 
+ * @param str Chaîne source.
+ * @param delim Caractère délimiteur.
+ * @return Tableau de chaînes alloué dynamiquement, ou NULL en cas d'erreur.
+ */
 char **str_split(const char *str, char delim)
 {
     int words = count_words(str, delim);
@@ -102,6 +161,12 @@ char **str_split(const char *str, char delim)
     return split_words(str, delim, words);
 }
 
+/**
+ * @brief Supprime les espaces blancs à la fin d'une chaîne.
+ * 
+ * @param str Chaîne à modifier.
+ * @return Pointeur vers la même chaîne (modifiée).
+ */
 char *str_trim(char *str)
 {
     int len = 0;

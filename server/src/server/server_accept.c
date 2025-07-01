@@ -5,9 +5,20 @@
 ** server_accept
 */
 
+/**
+ * @file server_accept.c
+ * @brief Gère l'acceptation de nouveaux clients, leur ajout au poll et la déconnexion.
+ */
+
 #include "server.h"
 #include <fcntl.h>
 
+/**
+ * @brief Crée une structure de client pour un nouveau client connecté.
+ *
+ * @param client_fd Descripteur de fichier du client.
+ * @return Un pointeur vers le client nouvellement créé, ou NULL en cas d'erreur.
+ */
 static client_t *create_new_client(int client_fd)
 {
     client_t *client = calloc(1, sizeof(client_t));
@@ -24,6 +35,13 @@ static client_t *create_new_client(int client_fd)
     return client;
 }
 
+/**
+ * @brief Ajoute un client au tableau de poll.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client_fd Descripteur du nouveau client.
+ * @return true si l'ajout a réussi, false sinon.
+ */
 static bool add_client_to_poll(server_t *server, int client_fd)
 {
     if (server->poll_count >= MAX_CLIENTS)
@@ -34,12 +52,25 @@ static bool add_client_to_poll(server_t *server, int client_fd)
     return true;
 }
 
+/**
+ * @brief Ajoute un client à la liste chaînée des clients du serveur.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client Client à ajouter.
+ */
 static void add_client_to_list(server_t *server, client_t *client)
 {
     client->next = server->clients;
     server->clients = client;
 }
 
+/**
+ * @brief Traite l’acceptation d’un client : création, ajout au poll et envoi du message WELCOME.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client_fd Descripteur du client.
+ * @param client_addr Adresse du client.
+ */
 static void handle_client_accept(server_t *server, int client_fd,
     struct sockaddr_in *client_addr)
 {
@@ -57,6 +88,11 @@ static void handle_client_accept(server_t *server, int client_fd,
         inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port));
 }
 
+/**
+ * @brief Accepte un client si une connexion est en attente.
+ *
+ * @param server Pointeur vers le serveur.
+ */
 void server_accept_client(server_t *server)
 {
     struct sockaddr_in client_addr = {0};
@@ -73,6 +109,12 @@ void server_accept_client(server_t *server)
     handle_client_accept(server, client_fd, &client_addr);
 }
 
+/**
+ * @brief Retire un client du tableau de poll.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param fd Descripteur du client à retirer.
+ */
 static void remove_from_poll(server_t *server, int fd)
 {
     for (int i = 1; i < server->poll_count; i++) {
@@ -85,6 +127,11 @@ static void remove_from_poll(server_t *server, int fd)
     }
 }
 
+/**
+ * @brief Nettoie la file de commandes d’un client.
+ *
+ * @param client Pointeur vers le client.
+ */
 static void cleanup_command_queue(client_t *client)
 {
     command_t *next = NULL;
@@ -97,6 +144,12 @@ static void cleanup_command_queue(client_t *client)
     }
 }
 
+/**
+ * @brief Retire un client de la liste chaînée du serveur.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client Client à retirer.
+ */
 static void remove_client_from_list(server_t *server, client_t *client)
 {
     client_t **current = &server->clients;
@@ -110,6 +163,12 @@ static void remove_client_from_list(server_t *server, client_t *client)
     }
 }
 
+/**
+ * @brief Déconnecte proprement un client du serveur.
+ *
+ * @param server Pointeur vers le serveur.
+ * @param client Client à déconnecter.
+ */
 void server_disconnect_client(server_t *server, client_t *client)
 {
     if (!client)

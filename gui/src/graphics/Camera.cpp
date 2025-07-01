@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-LIL-4-1-zappy-yanis.asselman
+** File description:
+** Camera
+*/
+
 #include "../../include/Camera.hpp"
 
 namespace Zappy {
@@ -5,9 +12,7 @@ namespace Zappy {
 Camera::Camera()
 {
     raylibCamera.target = {0, 0};
-    raylibCamera.offset = {WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f};
-    raylibCamera.rotation = 0.0f;
-    raylibCamera.zoom = 1.0f;
+raylibCamera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};    raylibCamera.zoom = 1.0f;
     
     zoomLevel = 1.0f;
     targetPosition = Position(0, 0);
@@ -16,6 +21,9 @@ Camera::Camera()
 
 void Camera::update()
 {
+    raylibCamera.offset.x = GetScreenWidth() / 2.0f;
+    raylibCamera.offset.y = GetScreenHeight() / 2.0f;
+    
     if (smoothMovement) {
         float lerpFactor = 5.0f * GetFrameTime();
         raylibCamera.target.x += (targetPosition.x - raylibCamera.target.x) * lerpFactor;
